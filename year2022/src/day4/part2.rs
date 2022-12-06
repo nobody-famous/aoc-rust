@@ -2,7 +2,7 @@ use crate::{day4::utils::parse_pair, utils::do_work};
 
 use super::utils::{Pair, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 0;
+const CORRECT_ANSWER: usize = 921;
 
 pub fn solve() -> Result<(), String> {
     do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
