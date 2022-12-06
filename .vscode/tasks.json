@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "run",
+                "--release"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "test",
+                "day3::part2",
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+        }
+    ]
+}
