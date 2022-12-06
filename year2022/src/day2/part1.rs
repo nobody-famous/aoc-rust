@@ -3,7 +3,7 @@ use super::utils;
 const CORRECT_ANSWER: u32 = 11150;
 
 pub fn solve() -> Result<(), String> {
-    crate::utils::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+    core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
 fn get_answer(lines: Vec<String>) -> u32 {

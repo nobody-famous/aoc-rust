@@ -1,11 +1,11 @@
-use crate::{day4::utils::parse_pair, utils::do_work};
+use crate::day4::utils::parse_pair;
 
 use super::utils::{Pair, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 490;
 
 pub fn solve() -> Result<(), String> {
-    do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
