@@ -6,24 +6,71 @@ pub enum ParseState {
     Moves,
 }
 
+#[derive(Debug)]
+pub struct Move {
+    pub count: usize,
+    pub from: usize,
+    pub to: usize,
+}
+
+#[derive(Debug)]
 pub struct Dock {
     pub stacks: Vec<Vec<char>>,
+    pub moves: Vec<Move>,
 }
 
 impl Dock {
     pub fn new(size: usize) -> Self {
         Dock {
             stacks: vec![vec![]; size],
+            moves: vec![],
         }
+    }
+
+    pub fn add(self: &mut Self, idx: usize, ch: char) {
+        self.stacks[idx].push(ch)
     }
 }
 
 pub fn parse(lines: Vec<String>) -> Dock {
     let (stacks, ids, moves) = split_input(&lines);
     let size = get_dock_size(ids);
-    let dock = Dock::new(size);
+    let mut dock = Dock::new(size);
+
+    stacks.iter().rev().for_each(|row| {
+        for i in 0..dock.stacks.len() {
+            let idx = i * 4 + 1;
+            if idx < row.len() {
+                if let Some(ch) = row.chars().nth(idx) {
+                    if ch != ' ' {
+                        dock.add(i, ch);
+                    }
+                }
+            }
+        }
+    });
+
+    dock.moves = moves.iter().map(|line| parse_move(line)).collect();
 
     dock
+}
+
+fn parse_move(line: &str) -> Move {
+    let pieces: Vec<usize> = line
+        .split(' ')
+        .skip(1)
+        .step_by(2)
+        .map(|item| match item.parse() {
+            Ok(n) => n,
+            Err(_) => 0,
+        })
+        .collect();
+
+    Move {
+        count: pieces[0],
+        from: pieces[1],
+        to: pieces[2],
+    }
 }
 
 fn get_dock_size(ids: &str) -> usize {
