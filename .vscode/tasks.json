@@ -19,7 +19,7 @@
             "command": "cargo",
             "args": [
                 "test",
-                "day4::part2",
+                "day5::part2",
             ],
             "problemMatcher": [
                 "$rustc"
