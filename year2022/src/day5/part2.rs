@@ -2,7 +2,7 @@ const CORRECT_ANSWER: &str = "VLCWHTDSZ";
 
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
-use super::utils::Dock;
+use super::utils::State;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(
@@ -14,13 +14,13 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> String {
-    let mut dock = parse(lines);
+    let mut state = parse(lines);
 
-    for idx in 0..dock.moves.len() {
-        do_move(&mut dock, idx);
+    for idx in 0..state.moves.len() {
+        do_move(&mut state, idx);
     }
 
-    dock.stacks
+    state.stacks
         .iter()
         .map(|stack| match stack.last() {
             Some(ch) => *ch,
@@ -29,14 +29,14 @@ fn get_answer(lines: Vec<String>) -> String {
         .collect()
 }
 
-fn do_move(dock: &mut Dock, idx: usize) {
-    let to_do = &dock.moves[idx];
-    let size = dock.stacks[to_do.from - 1].len();
-    let mut to_move: Vec<char> = dock.stacks[to_do.from - 1]
+fn do_move(state: &mut State, idx: usize) {
+    let to_do = &state.moves[idx];
+    let size = state.stacks[to_do.from - 1].len();
+    let mut to_move: Vec<char> = state.stacks[to_do.from - 1]
         .drain(size - to_do.count..)
         .collect();
 
-    dock.stacks[to_do.to - 1].append(&mut to_move);
+    state.stacks[to_do.to - 1].append(&mut to_move);
 }
 
 #[cfg(test)]

@@ -14,14 +14,14 @@ pub struct Move {
 }
 
 #[derive(Debug)]
-pub struct Dock {
+pub struct State {
     pub stacks: Vec<Vec<char>>,
     pub moves: Vec<Move>,
 }
 
-impl Dock {
+impl State {
     pub fn new(size: usize) -> Self {
-        Dock {
+        State {
             stacks: vec![vec![]; size],
             moves: vec![],
         }
@@ -32,30 +32,30 @@ impl Dock {
     }
 }
 
-pub fn parse(lines: Vec<String>) -> Dock {
+pub fn parse(lines: Vec<String>) -> State {
     let (stacks, ids, moves) = split_input(&lines);
-    let size = get_dock_size(ids);
-    let mut dock = Dock::new(size);
+    let size = get_state_size(ids);
+    let mut state = State::new(size);
 
     stacks.iter().rev().for_each(|row| {
-        for i in 0..dock.stacks.len() {
+        for i in 0..state.stacks.len() {
             let idx = i * 4 + 1;
             if idx < row.len() {
                 if let Some(ch) = row.chars().nth(idx) {
                     if ch != ' ' {
-                        dock.add(i, ch);
+                        state.add(i, ch);
                     }
                 }
             }
         }
     });
 
-    dock.moves = moves.iter().map(|line| parse_move(line)).collect();
+    state.moves = moves.iter().map(parse_move).collect();
 
-    dock
+    state
 }
 
-fn parse_move(line: &str) -> Move {
+fn parse_move(line: &&String) -> Move {
     let pieces: Vec<usize> = line
         .split(' ')
         .skip(1)
@@ -73,16 +73,14 @@ fn parse_move(line: &str) -> Move {
     }
 }
 
-fn get_dock_size(ids: &str) -> usize {
-    let parts: Option<&str> = ids.split_whitespace().last();
-
-    match parts {
-        Some(s) => match s.parse::<usize>() {
-            Ok(n) => n,
-            _ => 0,
-        },
-        _ => 0,
+fn get_state_size(ids: &str) -> usize {
+    if let Some(s) = ids.split_whitespace().last() {
+        if let Ok(n) = s.parse::<usize>() {
+            return n;
+        }
     }
+
+    0
 }
 
 fn split_input(lines: &Vec<String>) -> (Vec<&String>, &str, Vec<&String>) {
