@@ -1,4 +1,4 @@
-const CORRECT_ANSWER: &str = "TBVFVDZPN";
+const CORRECT_ANSWER: &str = "VLCWHTDSZ";
 
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
@@ -30,14 +30,13 @@ fn get_answer(lines: Vec<String>) -> String {
 }
 
 fn do_move(dock: &mut Dock, idx: usize) {
-    let to_move = &dock.moves[idx];
+    let to_do = &dock.moves[idx];
+    let size = dock.stacks[to_do.from - 1].len();
+    let mut to_move: Vec<char> = dock.stacks[to_do.from - 1]
+        .drain(size - to_do.count..)
+        .collect();
 
-    for _ in 0..to_move.count {
-        match dock.stacks[to_move.from - 1].pop() {
-            Some(item) => dock.stacks[to_move.to - 1].push(item),
-            None => todo!(),
-        }
-    }
+    dock.stacks[to_do.to - 1].append(&mut to_move);
 }
 
 #[cfg(test)]
@@ -58,6 +57,6 @@ mod tests {
             "move 1 from 1 to 2".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), String::from("CMZ"))
+        assert_eq!(get_answer(lines), String::from("MCD"))
     }
 }
