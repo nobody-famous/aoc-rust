@@ -20,9 +20,10 @@ fn main() {
         Problem::new("day5/Part1".to_string(), day5::part1::solve),
         Problem::new("day5/part2".to_string(), day5::part2::solve),
         Problem::new("day6/part1".to_string(), day6::part1::solve),
+        Problem::new("day6/part2".to_string(), day6::part2::solve),
     ];
 
-    // let problems: Vec<Problem> = vec![Problem::new("day6/part1".to_string(), day6::part1::solve)];
+    // let problems: Vec<Problem> = vec![Problem::new("day6/part2".to_string(), day6::part2::solve)];
 
     let total = run_all(problems) as f64 / 1e6;
 
