@@ -14,12 +14,24 @@
             ],
         },
         {
-            "label": "Test",
+            "label": "Tests",
             "type": "shell",
             "command": "cargo",
             "args": [
                 "test",
-                "day6::part2",
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ],
+        },
+        {
+            "label": "Watch Test",
+            "type": "shell",
+            "command": "cargo",
+            "args": [
+                "watch",
+                "-x",
+                "test -- day7::part2",
             ],
             "problemMatcher": [
                 "$rustc"
