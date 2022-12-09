@@ -25,13 +25,12 @@
             ],
         },
         {
-            "label": "Watch Test",
+            "label": "Run Test",
             "type": "shell",
             "command": "cargo",
             "args": [
-                "watch",
-                "-x",
-                "test -- day7::part2",
+                "test",
+                "day8::part1",
             ],
             "problemMatcher": [
                 "$rustc"
