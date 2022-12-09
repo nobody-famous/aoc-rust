@@ -26,6 +26,7 @@ fn main() {
         Problem::new("day7/part1".to_string(), day7::part1::solve),
         Problem::new("day7/part2".to_string(), day7::part2::solve),
         Problem::new("day8/part1".to_string(), day8::part1::solve),
+        Problem::new("day8/part2".to_string(), day8::part2::solve),
     ];
 
     // let problems: Vec<Problem> = vec![Problem::new("day8/part2".to_string(), day8::part2::solve)];
