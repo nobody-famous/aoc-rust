@@ -4,6 +4,7 @@ pub const FILE_NAME: &str = "year2022/src/day7/puzzle.txt";
 pub struct State {
     pub stack: Vec<usize>,
     pub found: Vec<usize>,
+    pub root: usize,
 }
 
 impl State {
@@ -11,11 +12,12 @@ impl State {
         State {
             stack: vec![0],
             found: vec![],
+            root: 0,
         }
     }
 }
 
-pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> ()) -> usize {
+pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> ()) -> State {
     let mut state = State::new();
 
     for line in lines {
@@ -30,7 +32,7 @@ pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> ()) -> usize {
         pop(&mut state);
     }
 
-    state.found.iter().sum::<usize>()
+    state
 }
 
 fn handle_file(state: &mut State, line: String) {

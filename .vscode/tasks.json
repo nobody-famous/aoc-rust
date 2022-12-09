@@ -19,7 +19,6 @@
             "command": "cargo",
             "args": [
                 "test",
-                "day6::part2",
             ],
             "problemMatcher": [
                 "$rustc"
@@ -32,7 +31,7 @@
             "args": [
                 "watch",
                 "-x",
-                "test -- day7::part1",
+                "test -- day7::part2",
             ],
             "problemMatcher": [
                 "$rustc"

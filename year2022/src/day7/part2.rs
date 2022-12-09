@@ -1,7 +1,8 @@
 use super::utils::{do_work, State, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 1501149;
-const TARGET: usize = 100000;
+const CORRECT_ANSWER: usize = 10096985;
+const TOTAL_SPACE: usize = 70000000;
+const TARGET_SPACE: usize = 30000000;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
@@ -9,19 +10,27 @@ pub fn solve() -> Result<(), String> {
 
 fn get_answer(lines: Vec<String>) -> usize {
     let state = do_work(lines, pop);
-    state.found.iter().sum::<usize>()
+    let unused = TOTAL_SPACE - state.root;
+    let answer = state
+        .found
+        .iter()
+        .filter(|item| unused + *item >= TARGET_SPACE)
+        .min();
+
+    match answer {
+        Some(n) => *n,
+        None => 0,
+    }
 }
 
 fn pop(state: &mut State) {
     match state.stack.pop() {
         Some(n) => {
-            if n <= TARGET {
-                state.found.push(n);
-            }
+            state.found.push(n);
 
             match state.stack.pop() {
                 Some(n1) => state.stack.push(n + n1),
-                None => (),
+                None => state.root = n,
             }
         }
         None => todo!(),
@@ -60,6 +69,6 @@ mod tests {
             "7214296 k".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 95437);
+        assert_eq!(get_answer(lines), 24933642);
     }
 }
