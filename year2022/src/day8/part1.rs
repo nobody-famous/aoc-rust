@@ -1,4 +1,4 @@
-use super::utils::FILE_NAME;
+use super::utils::{create_visible, parse_rows, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1543;
 
@@ -7,14 +7,8 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    let rows: Vec<Vec<usize>> = lines.iter().map(|line| parse_row(line)).collect();
-    let mut visible: Vec<Vec<bool>> = rows
-        .clone()
-        .iter()
-        .map(|row| row.clone().iter().map(|_| false).collect())
-        .collect();
-
-    set_boundary(&mut visible);
+    let rows = parse_rows(lines);
+    let mut visible = create_visible(&rows);
 
     for idx in 1..rows.len() - 1 {
         check_row(&rows, &mut visible, idx);
@@ -29,19 +23,6 @@ fn get_answer(lines: Vec<String>) -> usize {
             .iter()
             .fold(0, |acc, col| acc + if *col { 1 } else { 0 })
     })
-}
-
-fn set_boundary(visible: &mut Vec<Vec<bool>>) {
-    let idx = visible.len() - 1;
-
-    visible[0] = visible[0].iter().map(|_| true).collect();
-    visible[idx] = visible[idx].iter().map(|_| true).collect();
-
-    for idx in 1..visible.len() - 1 {
-        let end = visible[idx].len() - 1;
-        visible[idx][0] = true;
-        visible[idx][end] = true;
-    }
 }
 
 fn check_row(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
@@ -107,13 +88,6 @@ fn update_row(
     }
 
     new_max
-}
-
-fn parse_row(line: &str) -> Vec<usize> {
-    line.chars().fold(vec![], |mut acc, ch| {
-        acc.push(ch as usize - '0' as usize);
-        acc
-    })
 }
 
 #[cfg(test)]
