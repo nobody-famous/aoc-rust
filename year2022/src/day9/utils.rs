@@ -53,16 +53,14 @@ impl Point {
 
 #[derive(Debug)]
 pub struct State {
-    pub head: Point,
-    pub tail: Point,
+    pub knots: Vec<Point>,
     pub seen: HashSet<Point>,
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(size: usize) -> Self {
         State {
-            head: Point::new(0, 0),
-            tail: Point::new(0, 0),
+            knots: vec![Point::new(0, 0); size],
             seen: HashSet::new(),
         }
     }
@@ -85,7 +83,7 @@ pub fn do_move(p1: &Point, p2: &Point, dir: &Direction) -> (Point, Point) {
     (new_p1, new_p2)
 }
 
-fn move_follower(p1: &Point, p2: &Point) -> Point {
+pub fn move_follower(p1: &Point, p2: &Point) -> Point {
     let diff_x = p1.x - p2.x;
     let dx = diff_x.abs();
     let diff_y = p1.y - p2.y;
