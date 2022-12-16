@@ -20,34 +20,36 @@ fn get_answer(lines: Vec<String>) -> usize {
         }
     }
 
-    walk(vec![ToVisit::new(state, "AA".to_string())]);
+    let mut nodes = vec![ToVisit::new(state, "AA".to_string())];
+
+    for _ in 1..30 {
+        nodes = walk(&nodes);
+        println!("NODES: {}", nodes.len());
+    }
 
     0
 }
 
-fn walk(to_visit: Vec<ToVisit>) {
+fn walk(to_visit: &Vec<ToVisit>) -> Vec<ToVisit> {
     let nodes = to_visit.iter().map(|n| n);
+    let mut new_nodes: Vec<ToVisit> = vec![];
 
     for node in nodes {
-        println!("NAME {:?} {:?}", node.name, node.state);
-        if node.state.minutes >= 1 {
-            continue;
-        }
-
         let valve: &Valve = &node.state.valves[&node.name];
         let mut new_state = node.state.clone();
 
         new_state.minutes += 1;
 
-        let kid_nodes: Vec<ToVisit> = valve
+        let mut kid_nodes: Vec<ToVisit> = valve
             .kids
             .iter()
             .map(|k| ToVisit::new(new_state.clone(), k.clone()))
             .collect();
 
-        println!("WALK {:?}", kid_nodes);
-        walk(kid_nodes);
+        new_nodes.append(&mut kid_nodes);
     }
+
+    new_nodes
 }
 
 #[cfg(test)]
