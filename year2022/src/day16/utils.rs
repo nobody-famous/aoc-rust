@@ -17,6 +17,7 @@ impl Valve {
 #[derive(Debug, Clone)]
 pub struct State {
     pub valves: HashMap<String, Valve>,
+    pub to_open: Vec<String>,
     pub opened: HashSet<String>,
     pub flow: usize,
     pub minutes: usize,
@@ -24,8 +25,15 @@ pub struct State {
 
 impl State {
     pub fn new(valves: HashMap<String, Valve>) -> Self {
+        let to_open = valves
+            .iter()
+            .filter(|(_, v)| v.rate > 0)
+            .map(|(name, _)| name.clone())
+            .collect::<Vec<String>>();
+
         State {
             valves,
+            to_open,
             opened: HashSet::new(),
             flow: 0,
             minutes: 0,
@@ -33,16 +41,43 @@ impl State {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct ToVisit {
-    pub state: State,
-    pub name: String,
+pub fn build_map(valves: &HashMap<String, Valve>) -> HashMap<String, HashMap<String, usize>> {
+    valves.iter().fold(HashMap::new(), |mut acc, (name, _)| {
+        acc.insert(name.clone(), get_dists(&valves, name));
+        acc
+    })
 }
 
-impl ToVisit {
-    pub fn new(state: State, name: String) -> Self {
-        ToVisit { state, name }
+fn get_dists(valves: &HashMap<String, Valve>, start: &String) -> HashMap<String, usize> {
+    let mut dists: HashMap<String, usize> = HashMap::new();
+    let mut cur_dist: usize = 0;
+    let mut to_visit: Vec<String> = vec![start.clone()];
+    let mut seen: HashSet<String> = HashSet::new();
+
+    dists.insert(start.clone(), 0);
+    seen.insert(start.clone());
+
+    while to_visit.len() > 0 {
+        cur_dist += 1;
+
+        let mut next_nodes: Vec<String> = vec![];
+        while let Some(node) = to_visit.pop() {
+            seen.insert(node.clone());
+
+            if let Some(valve) = valves.get(&node) {
+                valve.kids.iter().for_each(|kid| {
+                    if !seen.contains(kid) {
+                        let _ = dists.insert(kid.clone(), cur_dist);
+                        next_nodes.push(kid.clone());
+                    }
+                })
+            }
+        }
+
+        to_visit = next_nodes;
     }
+
+    dists
 }
 
 pub fn parse(lines: Vec<String>) -> HashMap<String, Valve> {

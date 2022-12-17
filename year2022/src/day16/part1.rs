@@ -1,6 +1,6 @@
 use crate::day16::utils::State;
 
-use super::utils::{parse, ToVisit, Valve, FILE_NAME};
+use super::utils::{build_map, parse, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 0;
 
@@ -10,46 +10,14 @@ pub fn solve() -> Result<(), String> {
 
 fn get_answer(lines: Vec<String>) -> usize {
     let valves = parse(lines);
-    let mut state = State::new(valves);
+    let dist_map = build_map(&valves);
+    let state = State::new(valves);
 
-    for key in state.valves.keys() {
-        let valve = &state.valves[key];
-
-        if valve.rate == 0 {
-            state.opened.insert(key.to_string());
-        }
-    }
-
-    let mut nodes = vec![ToVisit::new(state, "AA".to_string())];
-
-    for _ in 1..30 {
-        nodes = walk(&nodes);
-        println!("NODES: {}", nodes.len());
+    for (name, dists) in dist_map {
+        println!("{:?} {:?}", name, dists);
     }
 
     0
-}
-
-fn walk(to_visit: &Vec<ToVisit>) -> Vec<ToVisit> {
-    let nodes = to_visit.iter().map(|n| n);
-    let mut new_nodes: Vec<ToVisit> = vec![];
-
-    for node in nodes {
-        let valve: &Valve = &node.state.valves[&node.name];
-        let mut new_state = node.state.clone();
-
-        new_state.minutes += 1;
-
-        let mut kid_nodes: Vec<ToVisit> = valve
-            .kids
-            .iter()
-            .map(|k| ToVisit::new(new_state.clone(), k.clone()))
-            .collect();
-
-        new_nodes.append(&mut kid_nodes);
-    }
-
-    new_nodes
 }
 
 #[cfg(test)]
