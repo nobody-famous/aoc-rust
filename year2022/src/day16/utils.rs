@@ -17,6 +17,7 @@ impl Valve {
 #[derive(Debug, Clone)]
 pub struct State {
     pub valves: HashMap<String, Valve>,
+    pub dist_map: HashMap<String, HashMap<String, usize>>,
     pub to_open: Vec<String>,
     pub opened: HashSet<String>,
     pub flow: usize,
@@ -24,7 +25,10 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(valves: HashMap<String, Valve>) -> Self {
+    pub fn new(
+        valves: HashMap<String, Valve>,
+        dist_map: HashMap<String, HashMap<String, usize>>,
+    ) -> Self {
         let to_open = valves
             .iter()
             .filter(|(_, v)| v.rate > 0)
@@ -33,6 +37,7 @@ impl State {
 
         State {
             valves,
+            dist_map,
             to_open,
             opened: HashSet::new(),
             flow: 0,
