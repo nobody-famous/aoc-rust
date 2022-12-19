@@ -14,37 +14,37 @@ impl Valve {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct State {
-    pub valves: HashMap<String, Valve>,
-    pub dist_map: HashMap<String, HashMap<String, usize>>,
-    pub to_open: Vec<String>,
-    pub opened: HashSet<String>,
-    pub flow: usize,
-    pub minutes: usize,
-}
+// #[derive(Debug, Clone)]
+// pub struct State {
+//     pub valves: HashMap<String, Valve>,
+//     pub dist_map: HashMap<String, HashMap<String, usize>>,
+//     pub to_open: Vec<String>,
+//     pub opened: HashSet<String>,
+//     pub flow: usize,
+//     pub minutes: usize,
+// }
 
-impl State {
-    pub fn new(
-        valves: HashMap<String, Valve>,
-        dist_map: HashMap<String, HashMap<String, usize>>,
-    ) -> Self {
-        let to_open = valves
-            .iter()
-            .filter(|(_, v)| v.rate > 0)
-            .map(|(name, _)| name.clone())
-            .collect::<Vec<String>>();
+// impl State {
+//     pub fn new(
+//         valves: HashMap<String, Valve>,
+//         dist_map: HashMap<String, HashMap<String, usize>>,
+//     ) -> Self {
+//         let to_open = valves
+//             .iter()
+//             .filter(|(_, v)| v.rate > 0)
+//             .map(|(name, _)| name.clone())
+//             .collect::<Vec<String>>();
 
-        State {
-            valves,
-            dist_map,
-            to_open,
-            opened: HashSet::new(),
-            flow: 0,
-            minutes: 0,
-        }
-    }
-}
+//         State {
+//             valves,
+//             dist_map,
+//             to_open,
+//             opened: HashSet::new(),
+//             flow: 0,
+//             minutes: 0,
+//         }
+//     }
+// }
 
 pub fn build_map(valves: &HashMap<String, Valve>) -> HashMap<String, HashMap<String, usize>> {
     valves.iter().fold(HashMap::new(), |mut acc, (name, _)| {
