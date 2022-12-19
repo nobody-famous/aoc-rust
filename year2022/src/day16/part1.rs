@@ -56,6 +56,7 @@ struct Config {
 fn get_answer(lines: Vec<String>) -> usize {
     let valves = parse(lines);
     let dist_map = build_map(&valves);
+    let max_flow = valves.iter().fold(0, |acc, (_, valve)| acc + valve.rate) * 30;
     let to_open = valves
         .iter()
         .filter(|(_, v)| v.rate > 0)
@@ -70,9 +71,9 @@ fn get_answer(lines: Vec<String>) -> usize {
         from_mask,
     };
 
-    let _ = walk(&cfg, String::from("AA"), 0, 0, vec![String::from("AA")]);
+    let dist = walk(&cfg, String::from("AA"), 0, 0, vec![String::from("AA")]);
 
-    0
+    max_flow - dist
 }
 
 fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, String>) {
@@ -100,102 +101,45 @@ fn get_to_visit(cfg: &Config, seen: usize) -> HashSet<&String> {
 }
 
 fn walk(cfg: &Config, name: String, seen: usize, dist: usize, path: Vec<String>) -> usize {
-    println!("WALK {:?} {:?}", dist, path);
-
     match cfg.dist_map.get(&name) {
         Some(dists) => {
             let to_visit = get_to_visit(cfg, seen);
 
-            let _ = to_visit.iter().fold(usize::MAX, |least, target|{
-                match cfg.to_mask.get(*target) {
-                    Some(mask) => todo!(),
-                    None => least,
+            to_visit.iter().fold(usize::MAX, |least, target| {
+                match (
+                    cfg.to_mask.get(*target),
+                    dists.get(*target),
+                    cfg.valves.get(*target),
+                ) {
+                    (Some(mask), Some(target_dist), Some(valve)) => {
+                        let new_seen = seen | mask;
+                        let new_dist = dist + target_dist + 1;
+                        let value = new_dist * valve.rate;
+                        let mut new_path = path.clone();
+
+                        new_path.push(String::from(*target));
+
+                        let subtotal =
+                            walk(cfg, String::from(*target), new_seen, new_dist, new_path);
+                        let mut new_value = value;
+
+                        if subtotal < usize::MAX {
+                            new_value += subtotal;
+                        }
+
+                        if new_value < least {
+                            new_value
+                        } else {
+                            least
+                        }
+                    }
+                    _ => least,
                 }
-            });
-
-            // to_visit
-            //     .iter()
-            //     .for_each(|target| match cfg.to_mask.get(*target) {
-            //         Some(mask) => {
-            //             let new_seen = seen | mask;
-            //             let mut new_path = path.clone();
-
-            //             new_path.push(String::from(*target));
-
-            //             if let Some(target_dist) = dists.get(*target) {
-            //                 let new_dist = dist + target_dist + 1;
-            //                 walk(cfg, String::from(*target), new_seen, new_dist, new_path);
-            //             }
-            //         }
-            //         None => todo!(),
-            //     });
+            })
         }
         None => todo!(),
-    };
-
-    0
+    }
 }
-
-// fn get_answer(lines: Vec<String>) -> usize {
-//     let valves = parse(lines);
-//     let dist_map = build_map(&valves);
-//     let max_flow = valves.iter().fold(0, |acc, (_, valve)| acc + valve.rate) * 30;
-//     let state = State::new(valves, dist_map);
-//     let mut to_visit: BinaryHeap<ToVisit> = BinaryHeap::new();
-//     let mut answer: Option<usize> = None;
-
-//     print_dists(&state.dist_map);
-
-//     to_visit.push(ToVisit {
-//         name: String::from("AA"),
-//         remaining: state.to_open.iter().fold(HashSet::new(), |mut acc, v| {
-//             acc.insert(v.clone());
-//             acc
-//         }),
-//         dist: 0,
-//         steps: 0,
-//         path: vec![],
-//     });
-
-//     while answer == None {
-//         if let Some(node) = to_visit.pop() {
-//             if node.remaining.len() == 0 {
-//                 answer = Some(max_flow - node.dist);
-//             }
-
-//             if let Some(dists) = state.dist_map.get(&node.name) {
-//                 node.remaining.iter().for_each(|name| {
-//                     if let (Some(dist), Some(valve)) = (dists.get(name), state.valves.get(name)) {
-//                         let new_steps = node.steps + dist + 1;
-//                         let new_dist = (new_steps * valve.rate) + node.dist;
-//                         let mut new_rem = node.remaining.clone();
-//                         let mut new_path = node.path.clone();
-
-//                         new_rem.remove(name);
-//                         new_path.push(node.name.clone());
-
-//                         to_visit.push(ToVisit {
-//                             name: name.clone(),
-//                             remaining: new_rem,
-//                             steps: new_steps,
-//                             dist: new_dist,
-//                             path: new_path,
-//                         })
-//                     }
-//                 });
-//             } else {
-//                 assert!(false);
-//             }
-//         } else {
-//             assert!(false);
-//         }
-//     }
-
-//     match answer {
-//         Some(n) => n,
-//         None => todo!(),
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
