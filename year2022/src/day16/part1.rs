@@ -53,6 +53,13 @@ struct Config {
     from_mask: HashMap<usize, String>,
 }
 
+struct Node {
+    name: String,
+    seen: usize,
+    dist: usize,
+    path: Vec<String>,
+}
+
 fn get_answer(lines: Vec<String>) -> usize {
     let valves = parse(lines);
     let dist_map = build_map(&valves);
@@ -71,7 +78,15 @@ fn get_answer(lines: Vec<String>) -> usize {
         from_mask,
     };
 
-    let dist = walk(&cfg, String::from("AA"), 0, 0, vec![String::from("AA")]);
+    let dist = new_walk(
+        &cfg,
+        Node {
+            name: String::from("AA"),
+            seen: 0,
+            dist: 0,
+            path: vec![String::from("AA")],
+        },
+    );
 
     max_flow - dist
 }
@@ -100,10 +115,66 @@ fn get_to_visit(cfg: &Config, seen: usize) -> HashSet<&String> {
         .collect()
 }
 
-fn walk(cfg: &Config, name: String, seen: usize, dist: usize, path: Vec<String>) -> usize {
-    match cfg.dist_map.get(&name) {
+fn new_walk(cfg: &Config, node: Node) -> usize {
+    let to_visit = get_to_visit(cfg, node.seen);
+
+    let least = to_visit.iter().fold(usize::MAX, |acc, target| {
+        match cfg.dist_map.get(&node.name) {
+            Some(dists) => {
+                let value = process_kid(cfg, &node, target, dists);
+
+                if value < acc {
+                    value
+                } else {
+                    acc
+                }
+            }
+            None => todo!(),
+        }
+    });
+
+    least
+}
+
+fn process_kid(
+    cfg: &Config,
+    node: &Node,
+    target: &String,
+    dists: &HashMap<String, usize>,
+) -> usize {
+    match (
+        cfg.to_mask.get(target),
+        cfg.valves.get(target),
+        dists.get(target),
+    ) {
+        (Some(mask), Some(valve), Some(target_dist)) => {
+            let new_dist = node.dist + target_dist + 1;
+            let to_end = new_walk(
+                cfg,
+                Node {
+                    name: target.clone(),
+                    seen: node.seen | mask,
+                    dist: new_dist,
+                    path: node.path.clone(),
+                },
+            );
+
+            let mut value = new_dist * valve.rate;
+
+            if to_end < usize::MAX {
+                value += to_end;
+            }
+
+            value
+        }
+        _ => todo!(),
+    }
+}
+
+fn walk(cfg: &Config, node: Node) -> usize {
+    match cfg.dist_map.get(&node.name) {
         Some(dists) => {
-            let to_visit = get_to_visit(cfg, seen);
+            let to_visit = get_to_visit(cfg, node.seen);
 
             to_visit.iter().fold(usize::MAX, |least, target| {
                 match (
@@ -112,15 +183,23 @@ fn walk(cfg: &Config, name: String, seen: usize, dist: usize, path: Vec<String>)
                     cfg.valves.get(*target),
                 ) {
                     (Some(mask), Some(target_dist), Some(valve)) => {
-                        let new_seen = seen | mask;
-                        let new_dist = dist + target_dist + 1;
+                        let new_seen = node.seen | mask;
+                        let new_dist = node.dist + target_dist + 1;
                         let value = new_dist * valve.rate;
-                        let mut new_path = path.clone();
+                        let mut new_path = node.path.clone();
 
                         new_path.push(String::from(*target));
 
-                        let subtotal =
-                            walk(cfg, String::from(*target), new_seen, new_dist, new_path);
+                        let subtotal = walk(
+                            cfg,
+                            Node {
+                                name: String::from(*target),
+                                seen: new_seen,
+                                dist: new_dist,
+                                path: new_path,
+                            },
+                        );
+
                         let mut new_value = value;
 
                         if subtotal < usize::MAX {
