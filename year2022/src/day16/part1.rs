@@ -60,6 +60,12 @@ struct Node {
     path: Vec<String>,
 }
 
+struct TargetInfo {
+    mask: usize,
+    rate: usize,
+    dist: usize,
+}
+
 fn get_answer(lines: Vec<String>) -> usize {
     let valves = parse(lines);
     let dist_map = build_map(&valves);
@@ -121,10 +127,10 @@ fn new_walk(cfg: &Config, node: Node) -> usize {
     let least = to_visit.iter().fold(usize::MAX, |acc, target| {
         match cfg.dist_map.get(&node.name) {
             Some(dists) => {
-                let value = process_kid(cfg, &node, target, dists);
+                let to_end = process_kid(cfg, &node, target, dists);
 
-                if value < acc {
-                    value
+                if to_end < acc {
+                    to_end
                 } else {
                     acc
                 }
@@ -136,89 +142,96 @@ fn new_walk(cfg: &Config, node: Node) -> usize {
     least
 }
 
+fn get_info(cfg: &Config, target: &String, dists: &HashMap<String, usize>) -> TargetInfo {
+    match (
+        cfg.to_mask.get(target),
+        cfg.valves.get(target),
+        dists.get(target),
+    ) {
+        (Some(mask), Some(valve), Some(dist)) => TargetInfo {
+            mask: *mask,
+            rate: valve.rate,
+            dist: *dist,
+        },
+        _ => todo!(),
+    }
+}
+
 fn process_kid(
     cfg: &Config,
     node: &Node,
     target: &String,
     dists: &HashMap<String, usize>,
 ) -> usize {
-    match (
-        cfg.to_mask.get(target),
-        cfg.valves.get(target),
-        dists.get(target),
-    ) {
-        (Some(mask), Some(valve), Some(target_dist)) => {
-            let new_dist = node.dist + target_dist + 1;
-            let to_end = new_walk(
-                cfg,
-                Node {
-                    name: target.clone(),
-                    seen: node.seen | mask,
-                    dist: new_dist,
-                    path: node.path.clone(),
-                },
-            );
+    let info = get_info(cfg, target, dists);
+    let new_dist = node.dist + info.dist + 1;
+    let to_end = new_walk(
+        cfg,
+        Node {
+            name: target.clone(),
+            seen: node.seen | info.mask,
+            dist: new_dist,
+            path: node.path.clone(),
+        },
+    );
 
-            let mut value = new_dist * valve.rate;
+    let mut value = new_dist * info.rate;
 
-            if to_end < usize::MAX {
-                value += to_end;
-            }
-
-            value
-        }
-        _ => todo!(),
+    if to_end < usize::MAX {
+        value += to_end;
     }
+
+    value
 }
 
-fn walk(cfg: &Config, node: Node) -> usize {
-    match cfg.dist_map.get(&node.name) {
-        Some(dists) => {
-            let to_visit = get_to_visit(cfg, node.seen);
+// fn walk(cfg: &Config, node: Node) -> usize {
+//     match cfg.dist_map.get(&node.name) {
+//         Some(dists) => {
+//             let to_visit = get_to_visit(cfg, node.seen);
 
-            to_visit.iter().fold(usize::MAX, |least, target| {
-                match (
-                    cfg.to_mask.get(*target),
-                    dists.get(*target),
-                    cfg.valves.get(*target),
-                ) {
-                    (Some(mask), Some(target_dist), Some(valve)) => {
-                        let new_seen = node.seen | mask;
-                        let new_dist = node.dist + target_dist + 1;
-                        let value = new_dist * valve.rate;
-                        let mut new_path = node.path.clone();
+//             to_visit.iter().fold(usize::MAX, |least, target| {
+//                 match (
+//                     cfg.to_mask.get(*target),
+//                     dists.get(*target),
+//                     cfg.valves.get(*target),
+//                 ) {
+//                     (Some(mask), Some(target_dist), Some(valve)) => {
+//                         let new_seen = node.seen | mask;
+//                         let new_dist = node.dist + target_dist + 1;
+//                         let value = new_dist * valve.rate;
+//                         let mut new_path = node.path.clone();
 
-                        new_path.push(String::from(*target));
+//                         new_path.push(String::from(*target));
 
-                        let subtotal = walk(
-                            cfg,
-                            Node {
-                                name: String::from(*target),
-                                seen: new_seen,
-                                dist: new_dist,
-                                path: new_path,
-                            },
-                        );
+//                         let subtotal = walk(
+//                             cfg,
+//                             Node {
+//                                 name: String::from(*target),
+//                                 seen: new_seen,
+//                                 dist: new_dist,
+//                                 path: new_path,
+//                             },
+//                         );
 
-                        let mut new_value = value;
+//                         let mut new_value = value;
 
-                        if subtotal < usize::MAX {
-                            new_value += subtotal;
-                        }
+//                         if subtotal < usize::MAX {
+//                             new_value += subtotal;
+//                         }
 
-                        if new_value < least {
-                            new_value
-                        } else {
-                            least
-                        }
-                    }
-                    _ => least,
-                }
-            })
-        }
-        None => todo!(),
-    }
-}
+//                         if new_value < least {
+//                             new_value
+//                         } else {
+//                             least
+//                         }
+//                     }
+//                     _ => least,
+//                 }
+//             })
+//         }
+//         None => todo!(),
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
