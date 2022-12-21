@@ -53,18 +53,20 @@ struct Config {
     from_mask: HashMap<usize, String>,
 }
 
+#[derive(Debug)]
 struct Node {
-    name: String,
-    seen: usize,
-    dist: usize,
-    path: Vec<String>,
+    cur: String,
+    seen: HashSet<String>,
+    time: usize,
 }
 
-struct TargetInfo {
-    mask: usize,
-    rate: usize,
-    dist: usize,
-}
+// struct TargetInfo {
+//     mask: usize,
+//     rate: usize,
+//     dist: usize,
+// }
+
+// type Cache = HashMap<Node, usize>;
 
 fn get_answer(lines: Vec<String>) -> usize {
     let valves = parse(lines);
@@ -84,17 +86,36 @@ fn get_answer(lines: Vec<String>) -> usize {
         from_mask,
     };
 
-    let dist = new_walk(
+    let dist = walk(
         &cfg,
         Node {
-            name: String::from("AA"),
-            seen: 0,
-            dist: 0,
-            path: vec![String::from("AA")],
+            cur: String::from("AA"),
+            seen: HashSet::new(),
+            time: 0,
         },
     );
 
     max_flow - dist
+}
+
+fn get_dist(
+    dists_map: &HashMap<String, HashMap<String, usize>>,
+    from: &String,
+    to: &String,
+) -> usize {
+    match dists_map.get(from) {
+        Some(dists) => match dists.get(to) {
+            Some(dist) => *dist,
+            None => {
+                println!("No distance for {:?} -> {:?}", from, to);
+                todo!()
+            }
+        },
+        None => {
+            println!("No distance for {:?} -> {:?}", from, to);
+            todo!()
+        }
+    }
 }
 
 fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, String>) {
@@ -111,78 +132,119 @@ fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, 
     (to, from)
 }
 
-fn get_to_visit(cfg: &Config, seen: usize) -> HashSet<&String> {
+fn walk(cfg: &Config, node: Node) -> usize {
+    let mut to_visit: Vec<Node> = get_to_visit(cfg, &node);
+
+    while to_visit.len() > 0 {
+        // println!("TIMES: {:?}", to_visit.iter().map(|n| n.time).collect::<Vec<usize>>());
+
+        let mut next_nodes: Vec<Node> = vec![];
+
+        for item in to_visit {
+            let mut new_to_visit = get_to_visit(cfg, &item);
+            next_nodes.append(&mut new_to_visit);
+        }
+
+        to_visit = next_nodes;
+    }
+
+    0
+}
+
+fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
+    let mut new_seen = node.seen.clone();
+    let dist = get_dist(&cfg.dist_map, &node.cur, target);
+
+    new_seen.insert(String::from(target));
+
+    Node {
+        cur: String::from(target),
+        seen: new_seen,
+        time: node.time + dist + 1,
+    }
+}
+
+fn get_to_visit(cfg: &Config, node: &Node) -> Vec<Node> {
     cfg.to_open
         .iter()
-        .filter(|target| match cfg.to_mask.get(*target) {
-            Some(mask) => mask & seen == 0,
-            None => false,
-        })
+        .filter(|target| !node.seen.contains(*target))
+        .map(|target| String::from(target))
+        .map(|target| to_node(cfg, node, &target))
+        .filter(|node| node.time < 30)
         .collect()
 }
 
-fn new_walk(cfg: &Config, node: Node) -> usize {
-    let to_visit = get_to_visit(cfg, node.seen);
+// fn new_walk(cfg: &Config, cache: &mut Cache, node: Node) -> usize {
+//     let to_visit = get_to_visit(cfg, node.seen);
 
-    let least = to_visit.iter().fold(usize::MAX, |acc, target| {
-        match cfg.dist_map.get(&node.name) {
-            Some(dists) => {
-                let to_end = process_kid(cfg, &node, target, dists);
+//     match cache.get(&node) {
+//         Some(v) => *v,
+//         _ => {
+//             let least = to_visit.iter().fold(usize::MAX, |acc, target| {
+//                 match cfg.dist_map.get(&node.name) {
+//                     Some(dists) => {
+//                         let to_end = process_kid(cfg, cache, &node, target, dists);
 
-                if to_end < acc {
-                    to_end
-                } else {
-                    acc
-                }
-            }
-            None => todo!(),
-        }
-    });
+//                         if to_end < acc {
+//                             to_end
+//                         } else {
+//                             acc
+//                         }
+//                     }
+//                     None => todo!(),
+//                 }
+//             });
 
-    least
-}
+//             cache.insert(node.clone(), least);
 
-fn get_info(cfg: &Config, target: &String, dists: &HashMap<String, usize>) -> TargetInfo {
-    match (
-        cfg.to_mask.get(target),
-        cfg.valves.get(target),
-        dists.get(target),
-    ) {
-        (Some(mask), Some(valve), Some(dist)) => TargetInfo {
-            mask: *mask,
-            rate: valve.rate,
-            dist: *dist,
-        },
-        _ => todo!(),
-    }
-}
+//             least
+//         }
+//     }
+// }
 
-fn process_kid(
-    cfg: &Config,
-    node: &Node,
-    target: &String,
-    dists: &HashMap<String, usize>,
-) -> usize {
-    let info = get_info(cfg, target, dists);
-    let new_dist = node.dist + info.dist + 1;
-    let to_end = new_walk(
-        cfg,
-        Node {
-            name: target.clone(),
-            seen: node.seen | info.mask,
-            dist: new_dist,
-            path: node.path.clone(),
-        },
-    );
+// fn get_info(cfg: &Config, target: &String, dists: &HashMap<String, usize>) -> TargetInfo {
+//     match (
+//         cfg.to_mask.get(target),
+//         cfg.valves.get(target),
+//         dists.get(target),
+//     ) {
+//         (Some(mask), Some(valve), Some(dist)) => TargetInfo {
+//             mask: *mask,
+//             rate: valve.rate,
+//             dist: *dist,
+//         },
+//         _ => todo!(),
+//     }
+// }
 
-    let mut value = new_dist * info.rate;
+// fn process_kid(
+//     cfg: &Config,
+//     cache: &mut Cache,
+//     node: &Node,
+//     target: &String,
+//     dists: &HashMap<String, usize>,
+// ) -> usize {
+//     let info = get_info(cfg, target, dists);
+//     let new_dist = node.dist + info.dist + 1;
+//     let to_end = new_walk(
+//         cfg,
+//         cache,
+//         Node {
+//             name: target.clone(),
+//             seen: node.seen | info.mask,
+//             dist: new_dist,
+//             path: node.path.clone(),
+//         },
+//     );
 
-    if to_end < usize::MAX {
-        value += to_end;
-    }
+//     let mut value = new_dist * info.rate;
 
-    value
-}
+//     if to_end < usize::MAX {
+//         value += to_end;
+//     }
+
+//     value
+// }
 
 // fn walk(cfg: &Config, node: Node) -> usize {
 //     match cfg.dist_map.get(&node.name) {
