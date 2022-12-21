@@ -136,8 +136,7 @@ fn walk(cfg: &Config, node: Node) -> usize {
         to_visit = next_nodes;
     }
 
-    // highest
-    0
+    highest
 }
 
 fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
