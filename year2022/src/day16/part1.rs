@@ -32,6 +32,7 @@ struct Config {
     from_mask: HashMap<usize, String>,
     max_time: usize,
     max_flow: usize,
+    highest: usize,
 }
 
 #[derive(Debug)]
@@ -40,6 +41,7 @@ struct Node {
     seen: HashSet<String>,
     time: usize,
     flow: usize,
+    rem_flow: usize,
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
@@ -53,7 +55,7 @@ fn get_answer(lines: Vec<String>) -> usize {
     let (to_mask, from_mask) = assign_masks(&to_open);
     let total_flow = valves.iter().fold(0, |acc, (_, valve)| acc + valve.rate);
     let max_flow = total_flow * 30;
-    let cfg = Config {
+    let mut cfg = Config {
         valves,
         dist_map,
         to_open,
@@ -61,15 +63,17 @@ fn get_answer(lines: Vec<String>) -> usize {
         from_mask,
         max_time: 30,
         max_flow,
+        highest: 0,
     };
 
     let dist = walk(
-        &cfg,
+        &mut cfg,
         Node {
             cur: String::from("AA"),
             seen: HashSet::new(),
             time: 0,
             flow: 0,
+            rem_flow: total_flow,
         },
     );
 
@@ -117,16 +121,15 @@ fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, 
     (to, from)
 }
 
-fn walk(cfg: &Config, node: Node) -> usize {
+fn walk(cfg: &mut Config, node: Node) -> usize {
     let mut to_visit: Vec<Node> = get_to_visit(cfg, &node);
-    let mut highest: usize = 0;
 
     while to_visit.len() > 0 {
         let mut next_nodes: Vec<Node> = vec![];
 
         for item in to_visit {
-            if item.flow > highest {
-                highest = item.flow;
+            if item.flow > cfg.highest {
+                cfg.highest = item.flow;
             }
 
             let mut new_to_visit = get_to_visit(cfg, &item);
@@ -136,7 +139,8 @@ fn walk(cfg: &Config, node: Node) -> usize {
         to_visit = next_nodes;
     }
 
-    highest
+    cfg.highest
+    // 0
 }
 
 fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
@@ -153,6 +157,7 @@ fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
         seen: new_seen,
         time: node.time + dist + 1,
         flow: new_flow,
+        rem_flow: node.rem_flow - flow,
     }
 }
 
@@ -162,7 +167,7 @@ fn get_to_visit(cfg: &Config, node: &Node) -> Vec<Node> {
         .filter(|target| !node.seen.contains(*target))
         .map(|target| String::from(target))
         .map(|target| to_node(cfg, node, &target))
-        .filter(|node| node.time < 30)
+        .filter(|node| node.time < cfg.max_time)
         .collect()
 }
 
