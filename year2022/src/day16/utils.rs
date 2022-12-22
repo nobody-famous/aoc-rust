@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 pub const FILE_NAME: &str = "year2022/src/day16/puzzle.txt";
 
@@ -14,66 +14,49 @@ impl Valve {
     }
 }
 
-// #[derive(Debug, Clone)]
-// pub struct State {
-//     pub valves: HashMap<String, Valve>,
-//     pub dist_map: HashMap<String, HashMap<String, usize>>,
-//     pub to_open: Vec<String>,
-//     pub opened: HashSet<String>,
-//     pub flow: usize,
-//     pub minutes: usize,
-// }
-
-// impl State {
-//     pub fn new(
-//         valves: HashMap<String, Valve>,
-//         dist_map: HashMap<String, HashMap<String, usize>>,
-//     ) -> Self {
-//         let to_open = valves
-//             .iter()
-//             .filter(|(_, v)| v.rate > 0)
-//             .map(|(name, _)| name.clone())
-//             .collect::<Vec<String>>();
-
-//         State {
-//             valves,
-//             dist_map,
-//             to_open,
-//             opened: HashSet::new(),
-//             flow: 0,
-//             minutes: 0,
-//         }
-//     }
-// }
-
-pub fn build_map(valves: &HashMap<String, Valve>) -> HashMap<String, HashMap<String, usize>> {
-    valves.iter().fold(HashMap::new(), |mut acc, (name, _)| {
-        acc.insert(name.clone(), get_dists(&valves, name));
+pub fn build_map(
+    to_mask: &HashMap<String, usize>,
+    valves: &HashMap<usize, Valve>,
+) -> HashMap<usize, HashMap<usize, usize>> {
+    valves.iter().fold(HashMap::new(), |mut acc, (mask, _)| {
+        acc.insert(*mask, get_dists(to_mask, &valves, *mask));
         acc
     })
 }
 
-fn get_dists(valves: &HashMap<String, Valve>, start: &String) -> HashMap<String, usize> {
-    let mut dists: HashMap<String, usize> = HashMap::new();
-    let mut cur_dist: usize = 0;
-    let mut to_visit: Vec<String> = vec![start.clone()];
-    let mut seen: HashSet<String> = HashSet::new();
+pub fn get_mask(to_mask: &HashMap<String, usize>, name: &String) -> usize {
+    match to_mask.get(name) {
+        Some(mask) => *mask,
+        None => todo!(),
+    }
+}
 
-    dists.insert(start.clone(), 0);
-    seen.insert(start.clone());
+fn get_dists(
+    to_mask: &HashMap<String, usize>,
+    valves: &HashMap<usize, Valve>,
+    start: usize,
+) -> HashMap<usize, usize> {
+    let mut dists: HashMap<usize, usize> = HashMap::new();
+    let mut cur_dist: usize = 0;
+    let mut to_visit = vec![start];
+    let mut seen: usize = 0;
+
+    dists.insert(start, 0);
+    seen |= start;
 
     while to_visit.len() > 0 {
         cur_dist += 1;
 
-        let mut next_nodes: Vec<String> = vec![];
+        let mut next_nodes: Vec<usize> = vec![];
         while let Some(node) = to_visit.pop() {
-            seen.insert(node.clone());
+            seen |= node;
 
             if let Some(valve) = valves.get(&node) {
                 valve.kids.iter().for_each(|kid| {
-                    if !seen.contains(kid) {
-                        let _ = dists.insert(kid.clone(), cur_dist);
-                        next_nodes.push(kid.clone());
+                    let kid_mask = get_mask(to_mask, kid);
+                    if seen & kid_mask == 0 {
+                        let _ = dists.insert(kid_mask, cur_dist);
+                        next_nodes.push(kid_mask);
                     }
                 })
             }
@@ -85,7 +68,7 @@ fn get_dists(valves: &HashMap<String, Valve>, start: &String) -> HashMap<String,
     dists
 }
 
-pub fn parse(lines: Vec<String>) -> HashMap<String, Valve> {
+pub fn parse(lines: Vec<String>) -> (HashMap<String, usize>, HashMap<usize, Valve>) {
     let mut valves = HashMap::new();
 
     for line in lines {
@@ -93,7 +76,34 @@ pub fn parse(lines: Vec<String>) -> HashMap<String, Valve> {
         valves.insert(valve, kids);
     }
 
-    valves
+    let keys: Vec<String> = valves.keys().map(|k| String::from(k)).collect();
+    let (to_mask, _) = assign_masks(&keys);
+
+    let out = valves
+        .iter()
+        .fold(HashMap::new(), |mut acc, (name, valve)| {
+            match to_mask.get(name) {
+                Some(mask) => acc.insert(*mask, valve.clone()),
+                None => todo!(),
+            };
+            acc
+        });
+
+    (to_mask, out)
+}
+
+fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, String>) {
+    let mut shift = 0;
+    let mut to = HashMap::new();
+    let mut from = HashMap::new();
+
+    names.iter().for_each(|name| {
+        to.insert(name.clone(), 1 << shift);
+        from.insert(1 << shift, name.clone());
+        shift += 1;
+    });
+
+    (to, from)
 }
 
 fn parse_valve(line: String) -> (String, Valve) {

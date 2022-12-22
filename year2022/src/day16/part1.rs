@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use super::utils::{build_map, parse, Valve, FILE_NAME};
+use super::utils::{build_map, get_mask, parse, Valve, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1716;
 
@@ -8,69 +8,46 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn print_dists(dists: &HashMap<String, HashMap<String, usize>>) {
-    let mut dist_vec: Vec<(&String, &HashMap<String, usize>)> = dists.iter().map(|e| e).collect();
-
-    dist_vec.sort_by(|(n1, _), (n2, _)| n1.cmp(n2));
-
-    dist_vec.iter().for_each(|(name, dist)| {
-        let mut v: Vec<(&String, &usize)> = dist.iter().map(|e| e).collect();
-
-        v.sort_by(|(n1, _), (n2, _)| n1.cmp(n2));
-
-        print!("{:?}", name);
-        v.iter().for_each(|(_, s)| print!(" {:?}", s));
-        println!();
-    });
-}
-
 struct Config {
-    valves: HashMap<String, Valve>,
-    dist_map: HashMap<String, HashMap<String, usize>>,
-    to_open: Vec<String>,
-    to_mask: HashMap<String, usize>,
-    from_mask: HashMap<usize, String>,
+    valves: HashMap<usize, Valve>,
+    dist_map: HashMap<usize, HashMap<usize, usize>>,
+    to_open: Vec<usize>,
     max_time: usize,
-    max_flow: usize,
     highest: usize,
 }
 
 #[derive(Debug)]
 struct Node {
-    cur: String,
-    seen: HashSet<String>,
+    cur: usize,
+    seen: usize,
     time: usize,
     flow: usize,
     rem_flow: usize,
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    let valves = parse(lines);
-    let dist_map = build_map(&valves);
+    let (to_mask, valves) = parse(lines);
+    let dist_map = build_map(&to_mask, &valves);
     let to_open = valves
         .iter()
         .filter(|(_, v)| v.rate > 0)
         .map(|(name, _)| name.clone())
-        .collect::<Vec<String>>();
-    let (to_mask, from_mask) = assign_masks(&to_open);
+        .collect::<Vec<usize>>();
     let total_flow = valves.iter().fold(0, |acc, (_, valve)| acc + valve.rate);
-    let max_flow = total_flow * 30;
+    let cur_mask = get_mask(&to_mask, &"AA".to_string());
     let mut cfg = Config {
         valves,
         dist_map,
         to_open,
-        to_mask,
-        from_mask,
         max_time: 30,
-        max_flow,
         highest: 0,
     };
 
     let dist = walk(
         &mut cfg,
         Node {
-            cur: String::from("AA"),
-            seen: HashSet::new(),
+            cur: cur_mask,
+            seen: 0,
             time: 0,
             flow: 0,
             rem_flow: total_flow,
@@ -80,20 +57,16 @@ fn get_answer(lines: Vec<String>) -> usize {
     dist
 }
 
-fn get_flow(cfg: &Config, name: &String) -> usize {
-    match cfg.valves.get(name) {
+fn get_flow(cfg: &Config, name: usize) -> usize {
+    match cfg.valves.get(&name) {
         Some(valve) => valve.rate,
         None => todo!(),
     }
 }
 
-fn get_dist(
-    dists_map: &HashMap<String, HashMap<String, usize>>,
-    from: &String,
-    to: &String,
-) -> usize {
-    match dists_map.get(from) {
-        Some(dists) => match dists.get(to) {
+fn get_dist(dists_map: &HashMap<usize, HashMap<usize, usize>>, from: usize, to: usize) -> usize {
+    match dists_map.get(&from) {
+        Some(dists) => match dists.get(&to) {
             Some(dist) => *dist,
             None => {
                 println!("No distance for {:?} -> {:?}", from, to);
@@ -105,20 +78,6 @@ fn get_dist(
             todo!()
         }
     }
-}
-
-fn assign_masks(names: &Vec<String>) -> (HashMap<String, usize>, HashMap<usize, String>) {
-    let mut shift = 0;
-    let mut to = HashMap::new();
-    let mut from = HashMap::new();
-
-    names.iter().for_each(|name| {
-        to.insert(name.clone(), 1 << shift);
-        from.insert(1 << shift, name.clone());
-        shift += 1;
-    });
-
-    (to, from)
 }
 
 fn walk(cfg: &mut Config, node: Node) -> usize {
@@ -140,20 +99,19 @@ fn walk(cfg: &mut Config, node: Node) -> usize {
     }
 
     cfg.highest
-    // 0
 }
 
-fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
-    let mut new_seen = node.seen.clone();
-    let dist = get_dist(&cfg.dist_map, &node.cur, target);
+fn to_node(cfg: &Config, node: &Node, target: usize) -> Node {
+    let mut new_seen = node.seen;
+    let dist = get_dist(&cfg.dist_map, node.cur, target);
     let flow = get_flow(cfg, target);
     let rem_time = cfg.max_time - (node.time + dist + 1);
     let new_flow = node.flow + (flow * rem_time);
 
-    new_seen.insert(String::from(target));
+    new_seen |= target;
 
     Node {
-        cur: String::from(target),
+        cur: target,
         seen: new_seen,
         time: node.time + dist + 1,
         flow: new_flow,
@@ -164,9 +122,8 @@ fn to_node(cfg: &Config, node: &Node, target: &String) -> Node {
 fn get_to_visit(cfg: &Config, node: &Node) -> Vec<Node> {
     cfg.to_open
         .iter()
-        .filter(|target| !node.seen.contains(*target))
-        .map(|target| String::from(target))
-        .map(|target| to_node(cfg, node, &target))
+        .filter(|target| node.seen & *target == 0)
+        .map(|target| to_node(cfg, node, *target))
         .filter(|node| node.time < cfg.max_time)
         .collect()
 }
