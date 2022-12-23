@@ -22,7 +22,6 @@ struct Node {
     seen: usize,
     time: usize,
     flow: usize,
-    rem_flow: usize,
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
@@ -33,7 +32,6 @@ fn get_answer(lines: Vec<String>) -> usize {
         .filter(|(_, v)| v.rate > 0)
         .map(|(name, _)| name.clone())
         .collect::<Vec<usize>>();
-    let total_flow = valves.iter().fold(0, |acc, (_, valve)| acc + valve.rate);
     let cur_mask = get_mask(&to_mask, &"AA".to_string());
     let mut cfg = Config {
         valves,
@@ -50,7 +48,6 @@ fn get_answer(lines: Vec<String>) -> usize {
             seen: 0,
             time: 0,
             flow: 0,
-            rem_flow: total_flow,
         },
     );
 
@@ -115,7 +112,6 @@ fn to_node(cfg: &Config, node: &Node, target: usize) -> Node {
         seen: new_seen,
         time: node.time + dist + 1,
         flow: new_flow,
-        rem_flow: node.rem_flow - flow,
     }
 }
 
