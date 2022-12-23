@@ -34,7 +34,7 @@ fn main() {
         Problem::new("day16/part1".to_string(), day16::part1::solve),
     ];
 
-    // let problems: Vec<Problem> = vec![Problem::new("day16/part1".to_string(), day16::part1::solve)];
+    let problems: Vec<Problem> = vec![Problem::new("day16/part2".to_string(), day16::part2::solve)];
 
     let total = run_all(problems) as f64 / 1e6;
 

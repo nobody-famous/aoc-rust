@@ -32,19 +32,18 @@ fn get_answer(lines: Vec<String>) -> usize {
         .filter(|(_, v)| v.rate > 0)
         .map(|(name, _)| name.clone())
         .collect::<Vec<usize>>();
-    let cur_mask = get_mask(&to_mask, &"AA".to_string());
     let mut cfg = Config {
         valves,
         dist_map,
         to_open,
-        max_time: 30,
+        max_time: 26,
         highest: 0,
     };
 
     let dist = walk(
         &mut cfg,
         Node {
-            cur: cur_mask,
+            cur: get_mask(&to_mask, &"AA".to_string()),
             seen: 0,
             time: 0,
             flow: 0,
@@ -102,7 +101,12 @@ fn to_node(cfg: &Config, node: &Node, target: usize) -> Node {
     let mut new_seen = node.seen;
     let dist = get_dist(&cfg.dist_map, node.cur, target);
     let flow = get_flow(cfg, target);
-    let rem_time = cfg.max_time - (node.time + dist + 1);
+    let to_now = node.time + dist + 1;
+    let rem_time = if to_now < cfg.max_time {
+        cfg.max_time - to_now
+    } else {
+        0
+    };
     let new_flow = node.flow + (flow * rem_time);
 
     new_seen |= target;
@@ -143,6 +147,6 @@ mod tests {
             "Valve JJ has flow rate=21; tunnel leads to valve II".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 1651)
+        assert_eq!(get_answer(lines), 1707)
     }
 }
