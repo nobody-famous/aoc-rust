@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use super::utils::{build_map, get_mask, parse, Valve, FILE_NAME};
+use super::utils::{create_config, get_mask, walk, Node, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1716;
 
@@ -8,120 +6,24 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-struct Config {
-    valves: HashMap<usize, Valve>,
-    dist_map: HashMap<usize, HashMap<usize, usize>>,
-    to_open: Vec<usize>,
-    max_time: usize,
-    highest: usize,
-}
-
-#[derive(Debug)]
-struct Node {
-    cur: usize,
-    seen: usize,
-    time: usize,
-    flow: usize,
-}
-
 fn get_answer(lines: Vec<String>) -> usize {
-    let (to_mask, valves) = parse(lines);
-    let dist_map = build_map(&to_mask, &valves);
-    let to_open = valves
-        .iter()
-        .filter(|(_, v)| v.rate > 0)
-        .map(|(name, _)| name.clone())
-        .collect::<Vec<usize>>();
-    let cur_mask = get_mask(&to_mask, &"AA".to_string());
-    let mut cfg = Config {
-        valves,
-        dist_map,
-        to_open,
-        max_time: 30,
-        highest: 0,
-    };
+    let mut cfg = create_config(lines, 30);
+    let cur_mask = get_mask(&cfg.masks, &"AA".to_string());
 
-    let dist = walk(
+    let dists = walk(
         &mut cfg,
         Node {
             cur: cur_mask,
-            seen: 0,
+            seen: cur_mask,
             time: 0,
             flow: 0,
         },
     );
 
-    dist
-}
-
-fn get_flow(cfg: &Config, name: usize) -> usize {
-    match cfg.valves.get(&name) {
-        Some(valve) => valve.rate,
-        None => todo!(),
+    match dists.iter().map(|(_, value)| value).max() {
+        Some(dist) => *dist,
+        None => 0,
     }
-}
-
-fn get_dist(dists_map: &HashMap<usize, HashMap<usize, usize>>, from: usize, to: usize) -> usize {
-    match dists_map.get(&from) {
-        Some(dists) => match dists.get(&to) {
-            Some(dist) => *dist,
-            None => {
-                println!("No distance for {:?} -> {:?}", from, to);
-                todo!()
-            }
-        },
-        None => {
-            println!("No distance for {:?} -> {:?}", from, to);
-            todo!()
-        }
-    }
-}
-
-fn walk(cfg: &mut Config, node: Node) -> usize {
-    let mut to_visit: Vec<Node> = get_to_visit(cfg, &node);
-
-    while to_visit.len() > 0 {
-        let mut next_nodes: Vec<Node> = vec![];
-
-        for item in to_visit {
-            if item.flow > cfg.highest {
-                cfg.highest = item.flow;
-            }
-
-            let mut new_to_visit = get_to_visit(cfg, &item);
-            next_nodes.append(&mut new_to_visit);
-        }
-
-        to_visit = next_nodes;
-    }
-
-    cfg.highest
-}
-
-fn to_node(cfg: &Config, node: &Node, target: usize) -> Node {
-    let mut new_seen = node.seen;
-    let dist = get_dist(&cfg.dist_map, node.cur, target);
-    let flow = get_flow(cfg, target);
-    let rem_time = cfg.max_time - (node.time + dist + 1);
-    let new_flow = node.flow + (flow * rem_time);
-
-    new_seen |= target;
-
-    Node {
-        cur: target,
-        seen: new_seen,
-        time: node.time + dist + 1,
-        flow: new_flow,
-    }
-}
-
-fn get_to_visit(cfg: &Config, node: &Node) -> Vec<Node> {
-    cfg.to_open
-        .iter()
-        .filter(|target| node.seen & *target == 0)
-        .map(|target| to_node(cfg, node, *target))
-        .filter(|node| node.time < cfg.max_time)
-        .collect()
 }
 
 #[cfg(test)]
