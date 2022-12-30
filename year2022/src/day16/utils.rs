@@ -17,7 +17,7 @@ pub struct Config {
     pub masks: HashMap<String, usize>,
 }
 
-pub fn walk<'a>(cfg: &'a Config, start: usize, max_time: usize) -> HashMap<usize, usize> {
+pub fn walk(cfg: &Config, start: usize, max_time: usize) -> HashMap<usize, usize> {
     let seen: usize = 0;
     let mut flows: HashMap<usize, usize> = HashMap::new();
 
@@ -26,8 +26,8 @@ pub fn walk<'a>(cfg: &'a Config, start: usize, max_time: usize) -> HashMap<usize
     flows
 }
 
-fn walk_node<'a>(
-    cfg: &'a Config,
+fn walk_node(
+    cfg: &Config,
     flows: &mut HashMap<usize, usize>,
     node: usize,
     time: usize,
