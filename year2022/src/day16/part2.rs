@@ -1,26 +1,36 @@
-use super::utils::{create_config, get_mask, walk, Node, FILE_NAME};
+use super::utils::{parse, walk, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 1716;
+const CORRECT_ANSWER: usize = 2504;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    let mut cfg = create_config(lines, 26);
-    let cur_mask = get_mask(&cfg.masks, &"AA".to_string());
+    let config = parse(lines);
+    let start = "AA".to_string();
+    let flows = walk(&config, &start, 26);
+    let tmp = flows.iter().fold(vec![], |mut acc, entry| {
+        acc.push(entry);
+        acc
+    });
+    let mut highest = 0;
 
-    let dists = walk(
-        &mut cfg,
-        Node {
-            cur: cur_mask,
-            seen: cur_mask,
-            time: 0,
-            flow: 0,
-        },
-    );
+    for i in 0..tmp.len() - 1 {
+        let (s1, v1) = tmp[i];
 
-    0
+        for j in i + 1..tmp.len() {
+            let (s2, v2) = tmp[j];
+
+            if s1.is_disjoint(s2) {
+                if v1 + v2 > highest {
+                    highest = v1 + v2;
+                }
+            }
+        }
+    }
+
+    highest
 }
 
 #[cfg(test)]

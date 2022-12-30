@@ -1,144 +1,159 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{BTreeSet, HashMap, HashSet},
+    ops::ControlFlow,
+};
 
 pub const FILE_NAME: &str = "year2022/src/day16/puzzle.txt";
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Clone)]
 pub struct Valve {
-    pub rate: usize,
-    pub kids: Vec<String>,
-}
-
-impl Valve {
-    pub fn new(rate: usize, kids: Vec<String>) -> Self {
-        Valve { rate, kids }
-    }
-}
-
-#[derive(Debug)]
-pub struct Node {
-    pub cur: usize,
-    pub seen: usize,
-    pub time: usize,
-    pub flow: usize,
+    name: String,
+    flow: usize,
+    kids: Vec<String>,
 }
 
 #[derive(Debug)]
 pub struct Config {
-    pub masks: HashMap<String, usize>,
-    pub valves: HashMap<usize, Valve>,
-    pub dist_map: HashMap<usize, HashMap<usize, usize>>,
-    pub to_open: Vec<usize>,
-    pub max_time: usize,
+    valves: HashMap<String, Valve>,
+    to_open: Vec<String>,
+    dist_map: HashMap<String, HashMap<String, usize>>,
 }
 
-pub fn create_config(lines: Vec<String>, max_time: usize) -> Config {
-    let valves = parse(lines);
-    let to_open = valves
-        .iter()
-        .filter(|(_, v)| v.rate > 0)
-        .map(|(name, _)| name.clone())
-        .collect::<Vec<String>>();
+pub fn walk<'a>(
+    cfg: &'a Config,
+    start: &'a String,
+    max_time: usize,
+) -> HashMap<BTreeSet<&'a String>, usize> {
+    let path = vec![start];
+    let seen = BTreeSet::new();
+    let mut flows: HashMap<BTreeSet<&String>, usize> = HashMap::new();
 
-    let mut tmp = to_open.clone();
-    tmp.push(String::from("AA"));
+    walk_node(cfg, &mut flows, &start, 0, 0, max_time, path, seen);
 
-    let masks = assign_masks(&tmp);
-    let dist_map = build_map(&masks, &tmp, &valves);
-    let new_to_open = to_open.iter().map(|name| get_mask(&masks, name)).collect();
-    let new_valves = valves
-        .iter()
-        .filter(|(key, _)| masks.contains_key(*key))
-        .fold(HashMap::new(), |mut acc, (key, value)| {
-            acc.insert(get_mask(&masks, key), value.clone());
-            acc
-        });
-
-    Config {
-        masks,
-        valves: new_valves,
-        dist_map,
-        to_open: new_to_open,
-        max_time,
-    }
+    flows
 }
 
-pub fn walk(cfg: &mut Config, node: Node) -> HashMap<usize, usize> {
-    let mut dists: HashMap<usize, usize> = HashMap::new();
-    let mut to_visit: Vec<Node> = get_to_visit(cfg, &node);
-
-    while to_visit.len() > 0 {
-        let mut next_nodes: Vec<Node> = vec![];
-
-        for item in to_visit {
-            update_dist(&mut dists, item.seen, item.flow);
-
-            let mut new_to_visit = get_to_visit(cfg, &item);
-            next_nodes.append(&mut new_to_visit);
+fn walk_node<'a>(
+    cfg: &'a Config,
+    flows: &mut HashMap<BTreeSet<&'a String>, usize>,
+    node: &String,
+    time: usize,
+    flow: usize,
+    max_time: usize,
+    path: Vec<&String>,
+    seen: BTreeSet<&'a String>,
+) {
+    for target in &cfg.to_open {
+        if seen.contains(target) {
+            continue;
         }
 
-        to_visit = next_nodes;
-    }
+        let dists = match cfg.dist_map.get(node) {
+            Some(d) => d,
+            None => todo!(),
+        };
+        let to_target = match dists.get(target) {
+            Some(dist) => dist,
+            None => todo!(),
+        };
+        let target_valve = match cfg.valves.get(target) {
+            Some(valve) => valve,
+            None => todo!(),
+        };
 
-    dists
+        let new_time = time + to_target + 1;
+        let rem_time = if new_time < max_time {
+            max_time - new_time
+        } else {
+            0
+        };
+        let new_flow = flow + (target_valve.flow * rem_time);
+
+        if new_time < max_time {
+            let mut new_path = path.clone();
+            new_path.push(target);
+
+            let mut new_seen = seen.clone();
+            new_seen.insert(target);
+
+            let old_flow = match flows.get(&new_seen) {
+                Some(flow) => *flow,
+                None => 0,
+            };
+
+            if new_flow > old_flow {
+                let _ = flows.insert(new_seen.clone(), new_flow);
+            }
+
+            walk_node(
+                cfg, flows, target, new_time, new_flow, max_time, new_path, new_seen,
+            );
+        }
+    }
 }
 
-pub fn get_mask(to_mask: &HashMap<String, usize>, name: &String) -> usize {
-    match to_mask.get(name) {
-        Some(mask) => *mask,
-        None => todo!(),
-    }
-}
+pub fn parse(lines: Vec<String>) -> Config {
+    let valves: Vec<Valve> = lines.iter().map(|line| parse_valve(line)).collect();
+    let to_open: Vec<String> = valves.iter().fold(vec![], |mut acc, valve| {
+        if valve.flow > 0 {
+            acc.push(valve.name.clone());
+        }
 
-fn update_dist(dists: &mut HashMap<usize, usize>, key: usize, value: usize) {
-    let old_value: usize = *dists.get(&key).unwrap_or(&0);
+        acc
+    });
+    let valve_map: HashMap<String, Valve> = valves.iter().fold(HashMap::new(), |mut acc, valve| {
+        acc.insert(valve.name.clone(), valve.clone());
+        acc
+    });
+    let dist_map = build_map(&valve_map, &to_open, "AA".to_string());
 
-    if value > old_value {
-        dists.insert(key, value);
+    Config {
+        valves: valve_map,
+        to_open,
+        dist_map,
     }
 }
 
 fn build_map(
-    masks: &HashMap<String, usize>,
-    to_open: &Vec<String>,
     valves: &HashMap<String, Valve>,
-) -> HashMap<usize, HashMap<usize, usize>> {
-    to_open.iter().fold(HashMap::new(), |mut acc, name| {
-        let mask = get_mask(masks, name);
-        acc.insert(mask, get_dists(masks, &valves, name));
-        acc
-    })
+    to_open: &Vec<String>,
+    start: String,
+) -> HashMap<String, HashMap<String, usize>> {
+    let mut dist_map: HashMap<String, HashMap<String, usize>> =
+        to_open.iter().fold(HashMap::new(), |mut acc, name| {
+            acc.insert(name.clone(), get_dists(valves, name));
+            acc
+        });
+
+    dist_map.insert(start.clone(), get_dists(valves, &start));
+
+    dist_map
 }
 
-fn get_dists(
-    masks: &HashMap<String, usize>,
-    valves: &HashMap<String, Valve>,
-    start: &String,
-) -> HashMap<usize, usize> {
-    let mut dists: HashMap<usize, usize> = HashMap::new();
-    let mut cur_dist: usize = 0;
-    let mut to_visit = vec![start];
-    let mut seen: HashSet<&String> = HashSet::new();
-    let start_mask = get_mask(masks, start);
+fn get_dists(valves: &HashMap<String, Valve>, start: &String) -> HashMap<String, usize> {
+    let mut dists: HashMap<String, usize> = HashMap::new();
+    let start_valve = lookup_valve(&valves, start);
+    let mut to_visit: Vec<String> = start_valve.kids.clone();
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut dist: usize = 0;
 
-    dists.insert(start_mask, 0);
-    seen.insert(start);
+    dists.insert(start.clone(), 0);
+    seen.insert(start.clone());
 
     while to_visit.len() > 0 {
-        cur_dist += 1;
+        let mut next_nodes: Vec<String> = vec![];
+        dist += 1;
 
-        let mut next_nodes: Vec<&String> = vec![];
-        while let Some(node) = to_visit.pop() {
-            seen.insert(node);
+        for target in &to_visit {
+            let valve = lookup_valve(valves, target);
 
-            if let Some(valve) = valves.get(node) {
-                valve.kids.iter().for_each(|kid| {
-                    if !seen.contains(kid) {
-                        if let Some(kid_mask) = masks.get(kid) {
-                            let _ = dists.insert(*kid_mask, cur_dist);
-                        }
-                        next_nodes.push(kid);
-                    }
-                })
+            seen.insert(target.clone());
+            dists.insert(target.clone(), dist);
+
+            for kid in &valve.kids {
+                if !seen.contains(kid) {
+                    next_nodes.push(kid.clone());
+                }
             }
         }
 
@@ -148,105 +163,31 @@ fn get_dists(
     dists
 }
 
-fn parse(lines: Vec<String>) -> HashMap<String, Valve> {
-    let mut valves = HashMap::new();
-
-    for line in lines {
-        let (valve, kids) = parse_valve(line);
-        valves.insert(valve, kids);
-    }
-
-    valves
-}
-
-fn assign_masks(names: &Vec<String>) -> HashMap<String, usize> {
-    let mut shift = 0;
-    let mut to = HashMap::new();
-
-    names.iter().for_each(|name| {
-        to.insert(name.clone(), 1 << shift);
-        shift += 1;
-    });
-
-    to
-}
-
-fn parse_valve(line: String) -> (String, Valve) {
-    let pieces: Vec<&str> = line.split(' ').collect();
-    let name = pieces[1];
-    let rate = parse_rate(pieces[4]);
-    let (_, kids) = pieces.split_at(9);
-
-    (
-        name.to_string(),
-        Valve::new(
-            rate,
-            kids.iter()
-                .map(|s| s.trim_end_matches(',').to_string())
-                .collect(),
-        ),
-    )
-}
-
-fn parse_rate(data: &str) -> usize {
-    let pieces: Vec<&str> = data.split('=').collect();
-
-    match pieces[1].trim_end_matches(';').parse::<usize>() {
-        Ok(n) => n,
-        Err(_) => todo!(),
-    }
-}
-
-fn get_flow(cfg: &Config, name: usize) -> usize {
-    match cfg.valves.get(&name) {
-        Some(valve) => valve.rate,
+fn lookup_valve<'a>(valve_map: &'a HashMap<String, Valve>, name: &String) -> &'a Valve {
+    match valve_map.get(name) {
+        Some(valve) => valve,
         None => todo!(),
     }
 }
 
-fn get_dist(dists_map: &HashMap<usize, HashMap<usize, usize>>, from: usize, to: usize) -> usize {
-    match dists_map.get(&from) {
-        Some(dists) => match dists.get(&to) {
-            Some(dist) => *dist,
-            None => {
-                println!("No distance for {:?} -> {:?}", from, to);
-                todo!()
-            }
-        },
-        None => {
-            println!("No distance for {:?} -> {:?}", from, to);
-            todo!()
-        }
+fn parse_valve(line: &String) -> Valve {
+    let parts: Vec<&str> = line.split(' ').collect();
+    let name = parts[1];
+    let flow = parse_flow(parts[4]);
+    let kids: Vec<String> = parts[9..].iter().map(|kid| kid.replace(",", "")).collect();
+
+    Valve {
+        name: name.to_string(),
+        flow,
+        kids,
     }
 }
 
-fn to_node(cfg: &Config, node: &Node, target: usize) -> Node {
-    let mut new_seen = node.seen;
-    let dist = get_dist(&cfg.dist_map, node.cur, target);
-    let flow = get_flow(cfg, target);
-    let tmp = node.time + dist + 1;
-    let rem_time = if cfg.max_time > tmp {
-        cfg.max_time - tmp
-    } else {
-        0
-    };
-    let new_flow = node.flow + (flow * rem_time);
+fn parse_flow(input: &str) -> usize {
+    let parts: Vec<String> = input.split('=').map(|p| p.replace(";", "")).collect();
 
-    new_seen |= target;
-
-    Node {
-        cur: target,
-        seen: new_seen,
-        time: node.time + dist + 1,
-        flow: new_flow,
+    match parts[1].parse::<usize>() {
+        Ok(rate) => rate,
+        Err(_) => todo!(),
     }
-}
-
-fn get_to_visit(cfg: &Config, node: &Node) -> Vec<Node> {
-    cfg.to_open
-        .iter()
-        .filter(|target| node.seen & *target == 0)
-        .map(|target| to_node(cfg, node, *target))
-        .filter(|node| node.time < cfg.max_time)
-        .collect()
 }

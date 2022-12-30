@@ -1,4 +1,4 @@
-use super::utils::{create_config, get_mask, walk, Node, FILE_NAME};
+use super::utils::{parse, walk, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1716;
 
@@ -7,21 +7,14 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    let mut cfg = create_config(lines, 30);
-    let cur_mask = get_mask(&cfg.masks, &"AA".to_string());
+    let config = parse(lines);
+    let start = "AA".to_string();
+    let flows = walk(&config, &start, 30);
 
-    let dists = walk(
-        &mut cfg,
-        Node {
-            cur: cur_mask,
-            seen: cur_mask,
-            time: 0,
-            flow: 0,
-        },
-    );
+    let dists: Vec<usize> = flows.iter().map(|(_, value)| *value).collect();
 
-    match dists.iter().map(|(_, value)| value).max() {
-        Some(dist) => *dist,
+    match dists.iter().max() {
+        Some(v) => *v,
         None => 0,
     }
 }
