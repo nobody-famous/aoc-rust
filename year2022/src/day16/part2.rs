@@ -1,4 +1,4 @@
-use super::utils::{parse, walk, FILE_NAME};
+use super::utils::{get_mask, parse, walk, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 2504;
 
@@ -8,8 +8,8 @@ pub fn solve() -> Result<(), String> {
 
 fn get_answer(lines: Vec<String>) -> usize {
     let config = parse(lines);
-    let start = "AA".to_string();
-    let flows = walk(&config, &start, 26);
+    let start = get_mask(&config.masks, &"AA".to_string());
+    let flows = walk(&config, start, 26);
     let tmp = flows.iter().fold(vec![], |mut acc, entry| {
         acc.push(entry);
         acc
@@ -22,7 +22,7 @@ fn get_answer(lines: Vec<String>) -> usize {
         for j in i + 1..tmp.len() {
             let (s2, v2) = tmp[j];
 
-            if s1.is_disjoint(s2) {
+            if s1 & s2 == 0 {
                 if v1 + v2 > highest {
                     highest = v1 + v2;
                 }

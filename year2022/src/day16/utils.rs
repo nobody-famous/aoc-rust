@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeSet, HashMap, HashSet},
-    ops::ControlFlow,
-};
+use std::collections::{HashMap, HashSet};
 
 pub const FILE_NAME: &str = "year2022/src/day16/puzzle.txt";
 
@@ -14,49 +11,44 @@ pub struct Valve {
 
 #[derive(Debug)]
 pub struct Config {
-    valves: HashMap<String, Valve>,
-    to_open: Vec<String>,
-    dist_map: HashMap<String, HashMap<String, usize>>,
+    pub valves: HashMap<usize, Valve>,
+    pub to_open: Vec<usize>,
+    pub dist_map: HashMap<usize, HashMap<usize, usize>>,
+    pub masks: HashMap<String, usize>,
 }
 
-pub fn walk<'a>(
-    cfg: &'a Config,
-    start: &'a String,
-    max_time: usize,
-) -> HashMap<BTreeSet<&'a String>, usize> {
-    let path = vec![start];
-    let seen = BTreeSet::new();
-    let mut flows: HashMap<BTreeSet<&String>, usize> = HashMap::new();
+pub fn walk<'a>(cfg: &'a Config, start: usize, max_time: usize) -> HashMap<usize, usize> {
+    let seen: usize = 0;
+    let mut flows: HashMap<usize, usize> = HashMap::new();
 
-    walk_node(cfg, &mut flows, &start, 0, 0, max_time, path, seen);
+    walk_node(cfg, &mut flows, start, 0, 0, max_time, seen);
 
     flows
 }
 
 fn walk_node<'a>(
     cfg: &'a Config,
-    flows: &mut HashMap<BTreeSet<&'a String>, usize>,
-    node: &String,
+    flows: &mut HashMap<usize, usize>,
+    node: usize,
     time: usize,
     flow: usize,
     max_time: usize,
-    path: Vec<&String>,
-    seen: BTreeSet<&'a String>,
+    seen: usize,
 ) {
     for target in &cfg.to_open {
-        if seen.contains(target) {
+        if seen & target != 0 {
             continue;
         }
 
-        let dists = match cfg.dist_map.get(node) {
+        let dists = match cfg.dist_map.get(&node) {
             Some(d) => d,
             None => todo!(),
         };
-        let to_target = match dists.get(target) {
+        let to_target = match dists.get(&target) {
             Some(dist) => dist,
             None => todo!(),
         };
-        let target_valve = match cfg.valves.get(target) {
+        let target_valve = match cfg.valves.get(&target) {
             Some(valve) => valve,
             None => todo!(),
         };
@@ -70,11 +62,7 @@ fn walk_node<'a>(
         let new_flow = flow + (target_valve.flow * rem_time);
 
         if new_time < max_time {
-            let mut new_path = path.clone();
-            new_path.push(target);
-
-            let mut new_seen = seen.clone();
-            new_seen.insert(target);
+            let new_seen = seen | target;
 
             let old_flow = match flows.get(&new_seen) {
                 Some(flow) => *flow,
@@ -82,36 +70,85 @@ fn walk_node<'a>(
             };
 
             if new_flow > old_flow {
-                let _ = flows.insert(new_seen.clone(), new_flow);
+                let _ = flows.insert(new_seen, new_flow);
             }
 
-            walk_node(
-                cfg, flows, target, new_time, new_flow, max_time, new_path, new_seen,
-            );
+            walk_node(cfg, flows, *target, new_time, new_flow, max_time, new_seen);
         }
     }
 }
 
 pub fn parse(lines: Vec<String>) -> Config {
     let valves: Vec<Valve> = lines.iter().map(|line| parse_valve(line)).collect();
-    let to_open: Vec<String> = valves.iter().fold(vec![], |mut acc, valve| {
+    let to_open_names: Vec<String> = valves.iter().fold(vec![], |mut acc, valve| {
         if valve.flow > 0 {
             acc.push(valve.name.clone());
         }
 
         acc
     });
+    let mut need_masks = to_open_names.clone();
+    need_masks.push(String::from("AA"));
+
+    let masks = assign_masks(&need_masks);
+    let to_open: Vec<usize> = to_open_names
+        .iter()
+        .map(|name| get_mask(&masks, name))
+        .collect();
     let valve_map: HashMap<String, Valve> = valves.iter().fold(HashMap::new(), |mut acc, valve| {
         acc.insert(valve.name.clone(), valve.clone());
         acc
     });
-    let dist_map = build_map(&valve_map, &to_open, "AA".to_string());
+    let valve_map_masked: HashMap<usize, Valve> =
+        valve_map
+            .iter()
+            .fold(HashMap::new(), |mut acc, (key, value)| {
+                if masks.contains_key(key) {
+                    acc.insert(get_mask(&masks, key), value.clone());
+                }
+                acc
+            });
+    let dist_map_raw = build_map(&valve_map, &to_open_names, "AA".to_string());
+    let dist_map = dist_map_raw
+        .iter()
+        .fold(HashMap::new(), |mut acc, (key, value)| {
+            if masks.contains_key(key) {
+                let value_map = value.iter().fold(HashMap::new(), |mut acc, (key, value)| {
+                    if masks.contains_key(key) {
+                        acc.insert(get_mask(&masks, key), *value);
+                    }
+                    acc
+                });
+                acc.insert(get_mask(&masks, key), value_map);
+            }
+            acc
+        });
 
     Config {
-        valves: valve_map,
+        valves: valve_map_masked,
         to_open,
         dist_map,
+        masks,
     }
+}
+
+pub fn get_mask(masks: &HashMap<String, usize>, name: &String) -> usize {
+    match masks.get(name) {
+        Some(mask) => *mask,
+        None => todo!(),
+    }
+}
+
+fn assign_masks(names: &Vec<String>) -> HashMap<String, usize> {
+    let mut masks: HashMap<String, usize> = HashMap::new();
+    let mut shift = 0;
+
+    for name in names {
+        masks.insert(name.clone(), 1 << shift);
+        shift += 1;
+    }
+
+    masks
 }
 
 fn build_map(

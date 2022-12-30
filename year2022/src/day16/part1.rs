@@ -1,4 +1,4 @@
-use super::utils::{parse, walk, FILE_NAME};
+use super::utils::{get_mask, parse, walk, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1716;
 
@@ -8,8 +8,8 @@ pub fn solve() -> Result<(), String> {
 
 fn get_answer(lines: Vec<String>) -> usize {
     let config = parse(lines);
-    let start = "AA".to_string();
-    let flows = walk(&config, &start, 30);
+    let start = get_mask(&config.masks, &"AA".to_string());
+    let flows = walk(&config, start, 30);
 
     let dists: Vec<usize> = flows.iter().map(|(_, value)| *value).collect();
 
