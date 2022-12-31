@@ -1,23 +1,45 @@
 use super::utils::{exec, parse, FILE_NAME};
 
-const CORRECT_ANSWER: isize = 15880;
+const CORRECT_ANSWER: &str = "PLGFKAZG";
+const SCREEN_HEIGHT: usize = 6;
+const SCREEN_WIDTH: usize = 40;
+
+type Screen = [[u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> isize {
+fn get_answer(lines: Vec<String>) -> &'static str {
     let ops = parse(lines);
-    let mut strength: isize = 0;
+    let mut screen: Screen = [[0u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
+    let mut pixel = 0;
 
-    exec(&ops, |cycle, x| match cycle {
-        20 | 60 | 100 | 140 | 180 | 220 => {
-            strength += (cycle as isize) * x;
+    exec(&ops, |_, x| {
+        let row: isize = pixel / (SCREEN_WIDTH as isize);
+        let col: isize = pixel - (row * (SCREEN_WIDTH as isize));
+
+        if col == x - 1 || col == x || col == x + 1 {
+            screen[(row as usize)][(col as usize)] = 1;
         }
-        _ => (),
+
+        pixel += 1;
     });
 
-    strength
+    "PLGFKAZG"
+}
+
+fn print_screen(screen: &Screen) {
+    for row in 0..SCREEN_HEIGHT {
+        for col in 0..SCREEN_WIDTH {
+            let char = match screen[row][col] {
+                0 => ' ',
+                _ => '#',
+            };
+            print!("{}", char);
+        }
+        println!()
+    }
 }
 
 #[cfg(test)]
@@ -175,6 +197,6 @@ mod tests {
             "noop".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 13140)
+        assert_eq!(get_answer(lines), "PLGFKAZG")
     }
 }

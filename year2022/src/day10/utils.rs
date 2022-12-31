@@ -8,7 +8,7 @@ pub enum Op {
 
 pub fn exec<F>(ops: &Vec<Op>, mut obs: F)
 where
-    F: FnMut(isize, isize) -> (),
+    F: FnMut(usize, isize) -> (),
 {
     let mut cycle = 0;
     let mut x = 1;
