@@ -1,8 +1,6 @@
-use std::vec;
-
 use super::utils::{exec, parse, FILE_NAME};
 
-const CORRECT_ANSWER: isize = 0;
+const CORRECT_ANSWER: isize = 15880;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
