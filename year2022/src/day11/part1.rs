@@ -1,4 +1,4 @@
-use super::utils::{parse, FILE_NAME};
+use super::utils::{parse, round, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 0;
 
@@ -7,7 +7,11 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    parse(lines);
+    let monkeys = parse(lines);
+
+    println!("{:?}", monkeys);
+    round(&monkeys);
+
     0
 }
 
