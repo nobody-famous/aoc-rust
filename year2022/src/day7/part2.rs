@@ -9,7 +9,7 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let state = do_work(lines, pop);
+    let state = do_work(lines, pop)?;
     let unused = TOTAL_SPACE - state.root;
     let answer = state
         .found
@@ -23,7 +23,7 @@ fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     }
 }
 
-fn pop(state: &mut State) {
+fn pop(state: &mut State) -> Result<(), String> {
     match state.stack.pop() {
         Some(n) => {
             state.found.push(n);
@@ -31,9 +31,11 @@ fn pop(state: &mut State) {
             match state.stack.pop() {
                 Some(n1) => state.stack.push(n + n1),
                 None => state.root = n,
-            }
+            };
+
+            Ok(())
         }
-        None => todo!(),
+        None => Err(String::from("Stack is empty")),
     }
 }
 

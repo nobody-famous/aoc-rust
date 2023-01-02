@@ -17,45 +17,58 @@ impl State {
     }
 }
 
-pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> ()) -> State {
+pub fn do_work(
+    lines: Vec<String>,
+    pop: fn(&mut State) -> Result<(), String>,
+) -> Result<State, String> {
     let mut state = State::new();
 
     for line in lines {
         if line.starts_with('$') {
-            cmd(&mut state, line, pop);
+            cmd(&mut state, line, pop)?;
         } else if !line.starts_with("dir") {
-            handle_file(&mut state, line);
+            handle_file(&mut state, line)?;
         }
     }
 
     while !state.stack.is_empty() {
-        pop(&mut state);
+        pop(&mut state)?;
     }
 
-    state
+    Ok(state)
 }
 
-fn handle_file(state: &mut State, line: String) {
+fn handle_file(state: &mut State, line: String) -> Result<(), String> {
     let parts: Vec<&str> = line.split(' ').collect();
 
     match parts.get(0) {
         Some(s) => match s.parse::<usize>() {
             Ok(n) => match state.stack.pop() {
-                Some(item) => state.stack.push(item + n),
-                None => todo!(),
+                Some(item) => {
+                    state.stack.push(item + n);
+                    Ok(())
+                }
+                None => Err(String::from("Stack is empty")),
             },
-            Err(_) => todo!(),
+            Err(_) => Err(format!("Failed to parse {:?}", s)),
         },
-        None => todo!(),
+        None => Err(String::from("No first entry in parts")),
     }
 }
 
-fn cmd(state: &mut State, line: String, pop: fn(&mut State) -> ()) {
+fn cmd(
+    state: &mut State,
+    line: String,
+    pop: fn(&mut State) -> Result<(), String>,
+) -> Result<(), String> {
     let parts: Vec<&str> = line.split(' ').collect();
 
     match (parts.get(1), parts.get(2)) {
-        (Some(s1), Some(s2)) if *s1 == "cd" && *s2 != ".." => state.stack.push(0),
+        (Some(s1), Some(s2)) if *s1 == "cd" && *s2 != ".." => {
+            state.stack.push(0);
+            Ok(())
+        }
         (Some(s1), Some(s2)) if *s1 == "cd" && *s2 == ".." => pop(state),
-        _ => (),
+        _ => Ok(()),
     }
 }

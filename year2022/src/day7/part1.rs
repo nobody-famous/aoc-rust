@@ -8,11 +8,11 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let state = do_work(lines, pop);
+    let state = do_work(lines, pop)?;
     Ok(state.found.iter().sum::<usize>())
 }
 
-fn pop(state: &mut State) {
+fn pop(state: &mut State) -> Result<(), String> {
     match state.stack.pop() {
         Some(n) => {
             if n <= TARGET {
@@ -22,9 +22,11 @@ fn pop(state: &mut State) {
             match state.stack.pop() {
                 Some(n1) => state.stack.push(n + n1),
                 None => (),
-            }
+            };
+
+            Ok(())
         }
-        None => todo!(),
+        None => Err(String::from("Stack is empty")),
     }
 }
 
