@@ -7,9 +7,9 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let config = parse(lines);
-    let start = get_mask(&config.masks, &"AA".to_string());
-    let flows = walk(&config, start, 30);
+    let config = parse(lines)?;
+    let start = get_mask(&config.masks, &"AA".to_string())?;
+    let flows = walk(&config, start, 30)?;
 
     let dists: Vec<usize> = flows.iter().map(|(_, value)| *value).collect();
 

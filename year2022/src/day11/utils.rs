@@ -30,7 +30,7 @@ pub struct Monkey {
 pub fn round(monkeys: &mut HashMap<usize, Monkey>) -> Result<(), String> {
     for ndx in 0..monkeys.len() {
         if let Some(monkey) = monkeys.get_mut(&ndx) {
-            let to_throw = process_monkey(monkey);
+            let to_throw = process_monkey(monkey)?;
 
             for (ndx, worries) in to_throw {
                 let target = match monkeys.get_mut(&ndx) {
@@ -50,11 +50,11 @@ pub fn round(monkeys: &mut HashMap<usize, Monkey>) -> Result<(), String> {
     Ok(())
 }
 
-fn process_monkey(monkey: &mut Monkey) -> HashMap<usize, Vec<usize>> {
+fn process_monkey(monkey: &mut Monkey) -> Result<HashMap<usize, Vec<usize>>, String> {
     let mut to_throw = HashMap::new();
 
     for item in &monkey.items {
-        let new_worry = update_worry(&monkey, *item);
+        let new_worry = update_worry(&monkey, *item)?;
         let target_ndx = if new_worry % monkey.test == 0 {
             monkey.op.true_target
         } else {
@@ -65,10 +65,7 @@ fn process_monkey(monkey: &mut Monkey) -> HashMap<usize, Vec<usize>> {
             to_throw.insert(target_ndx, vec![]);
         }
 
-        let v = match to_throw.get_mut(&target_ndx) {
-            Some(v) => v,
-            None => todo!(),
-        };
+        let v = get_to_throw_value(&mut to_throw, target_ndx)?;
 
         v.push(new_worry);
     }
@@ -76,10 +73,20 @@ fn process_monkey(monkey: &mut Monkey) -> HashMap<usize, Vec<usize>> {
     monkey.inspected += monkey.items.len();
     monkey.items.clear();
 
-    to_throw
+    Ok(to_throw)
 }
 
-fn update_worry(monkey: &Monkey, item: usize) -> usize {
+fn get_to_throw_value(
+    to_throw: &mut HashMap<usize, Vec<usize>>,
+    ndx: usize,
+) -> Result<&mut Vec<usize>, String> {
+    match to_throw.get_mut(&ndx) {
+        Some(v) => Ok(v),
+        None => Err(format!("Could not get to throw vector {:?}", ndx)),
+    }
+}
+
+fn update_worry(monkey: &Monkey, item: usize) -> Result<usize, String> {
     let left = match monkey.op.left {
         Arg::Value(v) => v,
         Arg::Old => item,
@@ -90,16 +97,13 @@ fn update_worry(monkey: &Monkey, item: usize) -> usize {
     };
 
     match monkey.op.op {
-        '*' => (left * right) / 3,
-        '+' => (left + right) / 3,
-        _ => {
-            println!("Invalid operation: {:?}", monkey.op.op);
-            todo!()
-        }
+        '*' => Ok((left * right) / 3),
+        '+' => Ok((left + right) / 3),
+        _ => Err(format!("Invalid operation: {:?}", monkey.op.op)),
     }
 }
 
-pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
+pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
     let start_re = Regex::new(r"Monkey (\d+):");
     let items_re = Regex::new(r"\s*Starting items: (.*)");
     let op_re = Regex::new(r"\s*Operation: new = (\S+) (.) (\S+)");
@@ -117,79 +121,63 @@ pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
     };
     let mut cur_test: usize = 0;
 
-    lines.iter().for_each(|line| {
+    for line in lines {
         if let (Ok(start), Ok(items), Ok(op), Ok(test), Ok(cond)) =
             (&start_re, &items_re, &op_re, &test_re, &cond_re)
         {
-            if start.is_match(line) {
-                for cap in start.captures_iter(line) {
-                    match cap[1].parse::<usize>() {
-                        Ok(n) => {
-                            cur_monkey = n;
-                            cur_items = vec![];
-                            cur_op = Operation {
-                                left: Arg::Old,
-                                right: Arg::Old,
-                                op: '+',
-                                true_target: 0,
-                                false_target: 0,
-                            };
-                        }
-                        Err(_) => todo!(),
-                    }
+            if start.is_match(&line) {
+                for cap in start.captures_iter(&line) {
+                    let n = parse_usize(&cap[1])?;
+                    cur_monkey = n;
+                    cur_items = vec![];
+                    cur_op = Operation {
+                        left: Arg::Old,
+                        right: Arg::Old,
+                        op: '+',
+                        true_target: 0,
+                        false_target: 0,
+                    };
                 }
-            } else if items.is_match(line) {
-                for cap in items.captures_iter(line) {
-                    cur_items = cap[1]
+            } else if items.is_match(&line) {
+                for cap in items.captures_iter(&line) {
+                    let pieces: Vec<String> = cap[1]
                         .split(',')
                         .map(|p| p.trim().replace(",", ""))
-                        .map(|p| match p.parse::<usize>() {
-                            Ok(n) => n,
-                            Err(_) => todo!(),
-                        })
                         .collect();
+
+                    cur_items = vec![];
+                    for piece in pieces {
+                        cur_items.push(parse_usize(&piece)?);
+                    }
                 }
-            } else if op.is_match(line) {
-                for cap in op.captures_iter(line) {
-                    let left = parse_arg(&cap[1]);
-                    let right = parse_arg(&cap[3]);
+            } else if op.is_match(&line) {
+                for cap in op.captures_iter(&line) {
+                    let left = parse_arg(&cap[1])?;
+                    let right = parse_arg(&cap[3])?;
                     let op_str = &cap[2].chars().nth(0);
-                    let op = match op_str {
-                        Some(ch) => ch,
-                        None => todo!(),
-                    };
+                    let op = op_str.ok_or("Could not find op string")?;
 
                     cur_op = Operation {
                         left,
-                        op: *op,
+                        op,
                         right,
                         true_target: 0,
                         false_target: 0,
                     };
                 }
-            } else if test.is_match(line) {
-                for cap in test.captures_iter(line) {
-                    cur_test = match cap[1].parse::<usize>() {
-                        Ok(n) => n,
-                        Err(_) => todo!(),
-                    };
+            } else if test.is_match(&line) {
+                for cap in test.captures_iter(&line) {
+                    cur_test = parse_usize(&cap[1])?;
                 }
-            } else if cond.is_match(line) {
-                for cap in cond.captures_iter(line) {
-                    let target = &cap[2].parse::<usize>();
+            } else if cond.is_match(&line) {
+                for cap in cond.captures_iter(&line) {
+                    let target = parse_usize(&cap[2])?;
                     if &cap[1] == "true" {
-                        cur_op.true_target = match target {
-                            Ok(n) => *n,
-                            Err(_) => todo!(),
-                        }
+                        cur_op.true_target = target;
                     } else if &cap[1] == "false" {
-                        cur_op.false_target = match target {
-                            Ok(n) => *n,
-                            Err(_) => todo!(),
-                        }
+                        cur_op.false_target = target;
                     } else {
-                        println!("Invalid condition: {:?}", line);
-                        todo!();
+                        return Err(format!("Invalid condition: {:?}", line));
                     }
                 }
             } else if line.len() == 0 {
@@ -203,11 +191,10 @@ pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
                     },
                 );
             } else {
-                println!("Invalid line: {:?}", line);
-                todo!();
+                return Err(format!("Invalid line: {:?}", line));
             }
         }
-    });
+    }
 
     monkey_map.insert(
         cur_monkey,
@@ -219,16 +206,20 @@ pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
         },
     );
 
-    monkey_map
+    Ok(monkey_map)
 }
 
-fn parse_arg(data: &str) -> Arg {
+fn parse_usize(data: &str) -> Result<usize, String> {
+    match data.parse::<usize>() {
+        Ok(n) => Ok(n),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+fn parse_arg(data: &str) -> Result<Arg, String> {
     if data == "old" {
-        Arg::Old
+        Ok(Arg::Old)
     } else {
-        match data.parse::<usize>() {
-            Ok(n) => Arg::Value(n),
-            Err(_) => todo!(),
-        }
+        Ok(Arg::Value(parse_usize(data)?))
     }
 }

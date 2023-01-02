@@ -9,8 +9,12 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let moves: Vec<Move> = lines.iter().map(|line| parse_move(line)).collect();
+    let mut moves: Vec<Move> = vec![];
     let mut state = State::new(10);
+
+    for line in lines {
+        moves.push(parse_move(&line)?);
+    }
 
     for to_move in moves.iter() {
         for _ in 0..to_move.dist {

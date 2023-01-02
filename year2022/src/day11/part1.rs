@@ -7,7 +7,7 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let mut monkeys = parse(lines);
+    let mut monkeys = parse(lines)?;
 
     for _ in 0..20 {
         if let Some(e) = round(&mut monkeys).err() {

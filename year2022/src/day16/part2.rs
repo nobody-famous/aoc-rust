@@ -7,9 +7,9 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    let config = parse(lines);
-    let start = get_mask(&config.masks, &"AA".to_string());
-    let flows = walk(&config, start, 26);
+    let config = parse(lines)?;
+    let start = get_mask(&config.masks, &"AA".to_string())?;
+    let flows = walk(&config, start, 26)?;
     let tmp = flows.iter().fold(vec![], |mut acc, entry| {
         acc.push(entry);
         acc
