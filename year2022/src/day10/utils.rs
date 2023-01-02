@@ -31,25 +31,28 @@ where
     }
 }
 
-pub fn parse(lines: Vec<String>) -> Vec<Op> {
-    lines
-        .iter()
-        .map(|line| {
-            let parts: Vec<&str> = line.split(' ').collect();
-            let value = if parts.len() > 1 {
-                match parts[1].parse::<isize>() {
-                    Ok(v) => v,
-                    Err(_) => todo!(),
-                }
-            } else {
-                0 as isize
-            };
+pub fn parse(lines: Vec<String>) -> Result<Vec<Op>, String> {
+    let mut ops: Vec<Op> = vec![];
 
-            if parts[0] == "addx" {
-                Op::Add(value)
-            } else {
-                Op::Noop
+    for line in lines {
+        let parts: Vec<&str> = line.split(' ').collect();
+        let value = if parts.len() > 1 {
+            match parts[1].parse::<isize>() {
+                Ok(v) => v,
+                Err(_) => return Err(format!("Could not parse {:?}", parts[1])),
             }
-        })
-        .collect()
+        } else {
+            0 as isize
+        };
+
+        let to_add = if parts[0] == "addx" {
+            Op::Add(value)
+        } else {
+            Op::Noop
+        };
+
+        ops.push(to_add);
+    }
+
+    Ok(ops)
 }

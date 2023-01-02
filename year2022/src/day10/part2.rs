@@ -11,7 +11,7 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<&'static str, String> {
-    let ops = parse(lines);
+    let ops = parse(lines)?;
     let mut screen: Screen = [[0u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
     let mut pixel = 0;
 

@@ -40,14 +40,11 @@ where
 {
     match read_lines(file_name) {
         Ok(lines) => {
-            let result = get_answer(lines);
+            let answer = get_answer(lines)?;
 
-            match result {
-                Ok(answer) => match check_answer(&answer, &exp_answer) {
-                    true => Ok(()),
-                    false => Err(std::format!("Wrong answer {:?}", answer)),
-                },
-                Err(e) => Err(e),
+            match check_answer(&answer, &exp_answer) {
+                true => Ok(()),
+                false => Err(std::format!("Wrong answer {:?}", answer)),
             }
         }
         Err(e) => Err(e.to_string()),

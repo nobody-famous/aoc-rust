@@ -7,7 +7,7 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<isize, String> {
-    let ops = parse(lines);
+    let ops = parse(lines)?;
     let mut strength: isize = 0;
 
     exec(&ops, |cycle, x| match cycle {
