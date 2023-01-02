@@ -21,23 +21,62 @@ pub struct Operation {
 
 #[derive(Debug)]
 pub struct Monkey {
-    items: Vec<usize>,
-    op: Operation,
-    test: usize,
+    pub items: Vec<usize>,
+    pub op: Operation,
+    pub test: usize,
+    pub inspected: usize,
 }
 
-pub fn round(monkeys: &HashMap<usize, Monkey>) {
+pub fn round(monkeys: &mut HashMap<usize, Monkey>) {
     for ndx in 0..monkeys.len() {
-        let monkey = match monkeys.get(&ndx) {
+        let monkey = match monkeys.get_mut(&ndx) {
             Some(m) => m,
             None => todo!(),
         };
 
-        for item in &monkey.items {
-            let new_worry = update_worry(&monkey, *item);
-            println!("new_worry {:?} {:?} {:?}", ndx, item, new_worry);
+        let to_throw = process_monkey(monkey);
+
+        for (ndx, worries) in to_throw {
+            let target = match monkeys.get_mut(&ndx) {
+                Some(t) => t,
+
+                None => todo!(),
+            };
+
+            for worry in worries {
+                target.items.push(worry)
+            }
         }
     }
+}
+
+fn process_monkey(monkey: &mut Monkey) -> HashMap<usize, Vec<usize>> {
+    let mut to_throw = HashMap::new();
+
+    for item in &monkey.items {
+        let new_worry = update_worry(&monkey, *item);
+        let target_ndx = if new_worry % monkey.test == 0 {
+            monkey.op.true_target
+        } else {
+            monkey.op.false_target
+        };
+
+        if !to_throw.contains_key(&target_ndx) {
+            to_throw.insert(target_ndx, vec![]);
+        }
+
+        let v = match to_throw.get_mut(&target_ndx) {
+            Some(v) => v,
+            None => todo!(),
+        };
+
+        v.push(new_worry);
+    }
+
+    monkey.inspected += monkey.items.len();
+    monkey.items.clear();
+
+    to_throw
 }
 
 fn update_worry(monkey: &Monkey, item: usize) -> usize {
@@ -160,6 +199,7 @@ pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
                         items: cur_items.clone(),
                         op: cur_op.clone(),
                         test: cur_test,
+                        inspected: 0,
                     },
                 );
             } else {
@@ -175,6 +215,7 @@ pub fn parse(lines: Vec<String>) -> HashMap<usize, Monkey> {
             items: cur_items.clone(),
             op: cur_op,
             test: cur_test,
+            inspected: 0,
         },
     );
 

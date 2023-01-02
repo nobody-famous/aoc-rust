@@ -29,18 +29,18 @@ fn get_answer(lines: Vec<String>) -> &'static str {
     "PLGFKAZG"
 }
 
-fn print_screen(screen: &Screen) {
-    for row in 0..SCREEN_HEIGHT {
-        for col in 0..SCREEN_WIDTH {
-            let char = match screen[row][col] {
-                0 => ' ',
-                _ => '#',
-            };
-            print!("{}", char);
-        }
-        println!()
-    }
-}
+// fn print_screen(screen: &Screen) {
+//     for row in 0..SCREEN_HEIGHT {
+//         for col in 0..SCREEN_WIDTH {
+//             let char = match screen[row][col] {
+//                 0 => ' ',
+//                 _ => '#',
+//             };
+//             print!("{}", char);
+//         }
+//         println!()
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

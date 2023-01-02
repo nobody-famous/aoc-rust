@@ -1,18 +1,24 @@
 use super::utils::{parse, round, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 0;
+const CORRECT_ANSWER: usize = 51075;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
 fn get_answer(lines: Vec<String>) -> usize {
-    let monkeys = parse(lines);
+    let mut monkeys = parse(lines);
 
-    println!("{:?}", monkeys);
-    round(&monkeys);
+    for _ in 0..20 {
+        round(&mut monkeys);
+    }
 
-    0
+    let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
+
+    inspected.sort();
+    inspected.reverse();
+
+    inspected.iter().take(2).product()
 }
 
 #[cfg(test)]
