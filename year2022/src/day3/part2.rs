@@ -8,8 +8,8 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> u32 {
-    lines
+fn get_answer(lines: Vec<String>) -> Result<u32, String> {
+    Ok(lines
         .iter()
         .fold(vec![vec![]], |mut acc, line| {
             if let Some(mut grp) = acc.pop() {
@@ -27,7 +27,7 @@ fn get_answer(lines: Vec<String>) -> u32 {
         .iter()
         .map(find_badge)
         .map(priority)
-        .sum::<u32>()
+        .sum::<u32>())
 }
 
 fn find_badge(group: &Vec<&String>) -> char {
@@ -59,6 +59,6 @@ mod tests {
             "CrZsJsPPZsGzwwsLwLmpwMDw".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 70)
+        assert_eq!(get_answer(lines), Ok(70))
     }
 }

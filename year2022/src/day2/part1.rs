@@ -6,8 +6,8 @@ pub fn solve() -> Result<(), String> {
     core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> u32 {
-    lines.iter().map(|line| round_score(line)).sum::<u32>()
+fn get_answer(lines: Vec<String>) -> Result<u32, String> {
+    Ok(lines.iter().map(|line| round_score(line)).sum::<u32>())
 }
 
 fn round_score(line: &str) -> u32 {
@@ -33,6 +33,6 @@ mod tests {
     fn sample() {
         let lines: Vec<String> = vec!["A Y".to_string(), "B X".to_string(), "C Z".to_string()];
 
-        assert_eq!(get_answer(lines), 15)
+        assert_eq!(get_answer(lines), Ok(15))
     }
 }

@@ -6,13 +6,13 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> u32 {
-    lines
+fn get_answer(lines: Vec<String>) -> Result<u32, String> {
+    Ok(lines
         .iter()
         .map(|line| line.split_at(line.len() / 2))
         .map(find_same)
         .map(priority)
-        .sum::<u32>()
+        .sum::<u32>())
 }
 
 fn find_same((a, b): (&str, &str)) -> char {
@@ -43,6 +43,6 @@ mod tests {
             "CrZsJsPPZsGzwwsLwLmpwMDw".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 157)
+        assert_eq!(get_answer(lines), Ok(157))
     }
 }

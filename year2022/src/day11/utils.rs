@@ -27,27 +27,27 @@ pub struct Monkey {
     pub inspected: usize,
 }
 
-pub fn round(monkeys: &mut HashMap<usize, Monkey>) {
+pub fn round(monkeys: &mut HashMap<usize, Monkey>) -> Result<(), String> {
     for ndx in 0..monkeys.len() {
-        let monkey = match monkeys.get_mut(&ndx) {
-            Some(m) => m,
-            None => todo!(),
-        };
+        if let Some(monkey) = monkeys.get_mut(&ndx) {
+            let to_throw = process_monkey(monkey);
 
-        let to_throw = process_monkey(monkey);
+            for (ndx, worries) in to_throw {
+                let target = match monkeys.get_mut(&ndx) {
+                    Some(t) => t,
+                    None => return Err(format!("Could not find entry for index {:?}", ndx)),
+                };
 
-        for (ndx, worries) in to_throw {
-            let target = match monkeys.get_mut(&ndx) {
-                Some(t) => t,
-
-                None => todo!(),
-            };
-
-            for worry in worries {
-                target.items.push(worry)
+                for worry in worries {
+                    target.items.push(worry)
+                }
             }
+        } else {
+            return Err(format!("Could not find entry for index {:?}", ndx));
         }
     }
+
+    Ok(())
 }
 
 fn process_monkey(monkey: &mut Monkey) -> HashMap<usize, Vec<usize>> {

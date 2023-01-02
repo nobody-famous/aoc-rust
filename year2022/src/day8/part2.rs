@@ -6,7 +6,7 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let rows = parse_rows(lines);
     let mut high: usize = 0;
 
@@ -19,7 +19,7 @@ fn get_answer(lines: Vec<String>) -> usize {
         }
     }
 
-    high
+    Ok(high)
 }
 
 fn get_score(rows: &Vec<Vec<usize>>, row: usize, col: usize) -> usize {
@@ -74,6 +74,6 @@ mod tests {
             "35390".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 8)
+        assert_eq!(get_answer(lines), Ok(8))
     }
 }

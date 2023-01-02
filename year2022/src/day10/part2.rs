@@ -10,7 +10,7 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> &'static str {
+fn get_answer(lines: Vec<String>) -> Result<&'static str, String> {
     let ops = parse(lines);
     let mut screen: Screen = [[0u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
     let mut pixel = 0;
@@ -26,7 +26,7 @@ fn get_answer(lines: Vec<String>) -> &'static str {
         pixel += 1;
     });
 
-    "PLGFKAZG"
+    Ok("PLGFKAZG")
 }
 
 // fn print_screen(screen: &Screen) {
@@ -197,6 +197,6 @@ mod tests {
             "noop".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), "PLGFKAZG")
+        assert_eq!(get_answer(lines), Ok("PLGFKAZG"))
     }
 }

@@ -6,7 +6,7 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let config = parse(lines);
     let start = get_mask(&config.masks, &"AA".to_string());
     let flows = walk(&config, start, 26);
@@ -30,7 +30,7 @@ fn get_answer(lines: Vec<String>) -> usize {
         }
     }
 
-    highest
+    Ok(highest)
 }
 
 #[cfg(test)]
@@ -52,6 +52,6 @@ mod tests {
             "Valve JJ has flow rate=21; tunnel leads to valve II".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 1707)
+        assert_eq!(get_answer(lines), Ok(1707))
     }
 }

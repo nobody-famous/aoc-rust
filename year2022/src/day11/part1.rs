@@ -6,11 +6,13 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let mut monkeys = parse(lines);
 
     for _ in 0..20 {
-        round(&mut monkeys);
+        if let Some(e) = round(&mut monkeys).err() {
+            return Err(e);
+        }
     }
 
     let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
@@ -18,7 +20,7 @@ fn get_answer(lines: Vec<String>) -> usize {
     inspected.sort();
     inspected.reverse();
 
-    inspected.iter().take(2).product()
+    Ok(inspected.iter().take(2).product())
 }
 
 #[cfg(test)]
@@ -57,6 +59,6 @@ mod tests {
             "        If false: throw to monkey 1".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 10605)
+        assert_eq!(get_answer(lines), Ok(10605))
     }
 }

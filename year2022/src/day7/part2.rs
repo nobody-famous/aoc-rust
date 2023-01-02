@@ -8,7 +8,7 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let state = do_work(lines, pop);
     let unused = TOTAL_SPACE - state.root;
     let answer = state
@@ -18,8 +18,8 @@ fn get_answer(lines: Vec<String>) -> usize {
         .min();
 
     match answer {
-        Some(n) => *n,
-        None => 0,
+        Some(n) => Ok(*n),
+        None => Err(String::from("No min found")),
     }
 }
 
@@ -69,6 +69,6 @@ mod tests {
             "7214296 k".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 24933642);
+        assert_eq!(get_answer(lines), Ok(24933642));
     }
 }

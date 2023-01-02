@@ -1,17 +1,17 @@
 pub const FILE_NAME: &str = "year2022/src/day6/puzzle.txt";
 
-pub fn get_answer(lines: Vec<String>, length: usize) -> u32 {
+pub fn get_answer(lines: Vec<String>, length: usize) -> Result<u32, String> {
     let line: &String = &lines[0];
     let mut idx = 0;
 
     while idx + length < line.len() {
         match find_dupe(line, idx, length) {
             Some(n) => idx = n + 1,
-            None => return (idx + length) as u32,
+            None => return Ok((idx + length) as u32),
         }
     }
 
-    0
+    Err(String::from("Not found"))
 }
 
 fn find_dupe(line: &String, start: usize, count: usize) -> Option<usize> {
