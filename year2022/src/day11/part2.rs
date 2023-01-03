@@ -1,6 +1,6 @@
 use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 51075;
+const CORRECT_ANSWER: usize = 11741456163;
 
 pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
