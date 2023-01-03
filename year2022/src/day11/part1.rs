@@ -1,4 +1,4 @@
-use super::utils::{parse, round, FILE_NAME};
+use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 51075;
 
@@ -10,7 +10,7 @@ fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let mut monkeys = parse(lines)?;
 
     for _ in 0..20 {
-        if let Some(e) = round(&mut monkeys).err() {
+        if let Some(e) = round(&mut monkeys, &update_worry).err() {
             return Err(e);
         }
     }
@@ -21,6 +21,23 @@ fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     inspected.reverse();
 
     Ok(inspected.iter().take(2).product())
+}
+
+fn update_worry(monkey: &Monkey, item: usize) -> Result<usize, String> {
+    let left = match monkey.op.left {
+        Arg::Value(v) => v,
+        Arg::Old => item,
+    };
+    let right = match monkey.op.right {
+        Arg::Value(v) => v,
+        Arg::Old => item,
+    };
+
+    match monkey.op.op {
+        '*' => Ok((left * right) / 3),
+        '+' => Ok((left + right) / 3),
+        _ => Err(format!("Invalid operation: {:?}", monkey.op.op)),
+    }
 }
 
 #[cfg(test)]

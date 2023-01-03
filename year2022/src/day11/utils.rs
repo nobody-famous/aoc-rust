@@ -12,11 +12,11 @@ pub enum Arg {
 
 #[derive(Debug, Clone)]
 pub struct Operation {
-    left: Arg,
-    right: Arg,
-    op: char,
-    true_target: usize,
-    false_target: usize,
+    pub left: Arg,
+    pub right: Arg,
+    pub op: char,
+    pub true_target: usize,
+    pub false_target: usize,
 }
 
 #[derive(Debug)]
@@ -27,10 +27,13 @@ pub struct Monkey {
     pub inspected: usize,
 }
 
-pub fn round(monkeys: &mut HashMap<usize, Monkey>) -> Result<(), String> {
+pub fn round(
+    monkeys: &mut HashMap<usize, Monkey>,
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> Result<usize, String>,
+) -> Result<(), String> {
     for ndx in 0..monkeys.len() {
         if let Some(monkey) = monkeys.get_mut(&ndx) {
-            let to_throw = process_monkey(monkey)?;
+            let to_throw = process_monkey(monkey, update_worry)?;
 
             for (ndx, worries) in to_throw {
                 let target = match monkeys.get_mut(&ndx) {
@@ -50,7 +53,10 @@ pub fn round(monkeys: &mut HashMap<usize, Monkey>) -> Result<(), String> {
     Ok(())
 }
 
-fn process_monkey(monkey: &mut Monkey) -> Result<HashMap<usize, Vec<usize>>, String> {
+fn process_monkey(
+    monkey: &mut Monkey,
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> Result<usize, String>,
+) -> Result<HashMap<usize, Vec<usize>>, String> {
     let mut to_throw = HashMap::new();
 
     for item in &monkey.items {
@@ -83,23 +89,6 @@ fn get_to_throw_value(
     match to_throw.get_mut(&ndx) {
         Some(v) => Ok(v),
         None => Err(format!("Could not get to throw vector {:?}", ndx)),
-    }
-}
-
-fn update_worry(monkey: &Monkey, item: usize) -> Result<usize, String> {
-    let left = match monkey.op.left {
-        Arg::Value(v) => v,
-        Arg::Old => item,
-    };
-    let right = match monkey.op.right {
-        Arg::Value(v) => v,
-        Arg::Old => item,
-    };
-
-    match monkey.op.op {
-        '*' => Ok((left * right) / 3),
-        '+' => Ok((left + right) / 3),
-        _ => Err(format!("Invalid operation: {:?}", monkey.op.op)),
     }
 }
 

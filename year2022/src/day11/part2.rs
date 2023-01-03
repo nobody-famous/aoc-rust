@@ -1,4 +1,4 @@
-use super::utils::{parse, round, FILE_NAME};
+use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 51075;
 
@@ -8,9 +8,27 @@ pub fn solve() -> Result<(), String> {
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let mut monkeys = parse(lines)?;
+    let mod_value: usize = monkeys.iter().map(|(_, m)| m.test).product();
 
     for _ in 0..10000 {
-        if let Some(e) = round(&mut monkeys).err() {
+        if let Some(e) = round(&mut monkeys, &|monkey: &Monkey, item| {
+            let left = match monkey.op.left {
+                Arg::Value(v) => v,
+                Arg::Old => item,
+            };
+            let right = match monkey.op.right {
+                Arg::Value(v) => v,
+                Arg::Old => item,
+            };
+
+            match monkey.op.op {
+                '*' => Ok((left * right) % mod_value),
+                '+' => Ok((left + right) % mod_value),
+                _ => Err(format!("Invalid operation: {:?}", monkey.op.op)),
+            }
+        })
+        .err()
+        {
             return Err(e);
         }
     }
@@ -59,6 +77,6 @@ mod tests {
             "        If false: throw to monkey 1".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), Ok(10605))
+        assert_eq!(get_answer(lines), Ok(2713310158))
     }
 }
