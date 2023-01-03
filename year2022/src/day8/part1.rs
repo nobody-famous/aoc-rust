@@ -6,7 +6,7 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     let rows = parse_rows(lines);
     let mut visible = create_visible(&rows);
 
@@ -18,11 +18,11 @@ fn get_answer(lines: Vec<String>) -> usize {
         check_col(&rows, &mut visible, idx);
     }
 
-    visible.iter().fold(0, |acc, row| {
+    Ok(visible.iter().fold(0, |acc, row| {
         acc + row
             .iter()
             .fold(0, |acc, col| acc + if *col { 1 } else { 0 })
-    })
+    }))
 }
 
 fn check_row(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
@@ -104,6 +104,6 @@ mod tests {
             "35390".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 21)
+        assert_eq!(get_answer(lines), Ok(21))
     }
 }

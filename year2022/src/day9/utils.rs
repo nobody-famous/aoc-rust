@@ -22,21 +22,29 @@ impl Move {
     }
 }
 
-pub fn parse_move(line: &String) -> Move {
+pub fn parse_move(line: &String) -> Result<Move, String> {
     let parts: Vec<&str> = line.split(' ').collect();
-    let dir = match parts[0] {
-        "U" => Direction::U,
-        "D" => Direction::D,
-        "L" => Direction::L,
-        "R" => Direction::R,
-        _ => todo!(),
-    };
-    let dist = match parts[1].parse::<usize>() {
-        Ok(n) => n,
-        Err(_) => todo!(),
-    };
+    let dir = parse_dir(parts[0])?;
+    let dist = parse_dist(parts[1])?;
 
-    Move::new(dir, dist)
+    Ok(Move::new(dir, dist))
+}
+
+fn parse_dist(data: &str) -> Result<usize, String> {
+    match data.parse::<usize>() {
+        Ok(n) => Ok(n),
+        Err(_) => Err(format!("Invalid distance value {:?}", data)),
+    }
+}
+
+fn parse_dir(data: &str) -> Result<Direction, String> {
+    match data {
+        "U" => Ok(Direction::U),
+        "D" => Ok(Direction::D),
+        "L" => Ok(Direction::L),
+        "R" => Ok(Direction::R),
+        _ => Err(format!("Invalid direction {:?}", data)),
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]

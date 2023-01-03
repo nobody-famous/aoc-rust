@@ -8,9 +8,13 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
-    let moves: Vec<Move> = lines.iter().map(|line| parse_move(line)).collect();
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+    let mut moves: Vec<Move> = vec![];
     let mut state = State::new(10);
+
+    for line in lines {
+        moves.push(parse_move(&line)?);
+    }
 
     for to_move in moves.iter() {
         for _ in 0..to_move.dist {
@@ -27,7 +31,7 @@ fn get_answer(lines: Vec<String>) -> usize {
         }
     }
 
-    state.seen.len()
+    Ok(state.seen.len())
 }
 
 #[cfg(test)]
@@ -47,7 +51,7 @@ mod tests {
             "R 2".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 1)
+        assert_eq!(get_answer(lines), Ok(1))
     }
 
     #[test]
@@ -63,6 +67,6 @@ mod tests {
             "U 20".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 36)
+        assert_eq!(get_answer(lines), Ok(36))
     }
 }

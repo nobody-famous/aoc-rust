@@ -8,8 +8,8 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
-    lines.iter().map(parse_pair).filter(does_overlap).count()
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+    Ok(lines.iter().map(parse_pair).filter(does_overlap).count())
 }
 
 fn does_overlap(pair: &Pair) -> bool {
@@ -32,6 +32,6 @@ mod tests {
             "2-6,4-8".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 4)
+        assert_eq!(get_answer(lines), Ok(4))
     }
 }

@@ -6,16 +6,16 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
-    let config = parse(lines);
-    let start = get_mask(&config.masks, &"AA".to_string());
-    let flows = walk(&config, start, 30);
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+    let config = parse(lines)?;
+    let start = get_mask(&config.masks, &"AA".to_string())?;
+    let flows = walk(&config, start, 30)?;
 
     let dists: Vec<usize> = flows.iter().map(|(_, value)| *value).collect();
 
     match dists.iter().max() {
-        Some(v) => *v,
-        None => 0,
+        Some(v) => Ok(*v),
+        None => Err(String::from("No max found")),
     }
 }
 
@@ -38,6 +38,6 @@ mod tests {
             "Valve JJ has flow rate=21; tunnel leads to valve II".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 1651)
+        assert_eq!(get_answer(lines), Ok(1651))
     }
 }

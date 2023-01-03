@@ -6,11 +6,11 @@ pub fn solve() -> Result<(), String> {
     core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> u32 {
+fn get_answer(lines: Vec<String>) -> Result<u32, String> {
     let mut groups = utils::parse(lines);
 
     groups.sort_by(|a, b| b.cmp(a));
-    groups.iter().take(3).sum::<u32>()
+    Ok(groups.iter().take(3).sum::<u32>())
 }
 
 #[cfg(test)]
@@ -36,6 +36,6 @@ mod tests {
             "10000".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 45000)
+        assert_eq!(get_answer(lines), Ok(45000))
     }
 }

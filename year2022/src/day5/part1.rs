@@ -13,31 +13,34 @@ pub fn solve() -> Result<(), String> {
     )
 }
 
-fn get_answer(lines: Vec<String>) -> String {
+fn get_answer(lines: Vec<String>) -> Result<String, String> {
     let mut state = parse(lines);
 
     for idx in 0..state.moves.len() {
-        do_move(&mut state, idx);
+        do_move(&mut state, idx)?;
     }
 
-    state.stacks
+    Ok(state
+        .stacks
         .iter()
         .map(|stack| match stack.last() {
             Some(ch) => *ch,
             None => ' ',
         })
-        .collect()
+        .collect())
 }
 
-fn do_move(state: &mut State, idx: usize) {
+fn do_move(state: &mut State, idx: usize) -> Result<(), String> {
     let to_move = &state.moves[idx];
 
     for _ in 0..to_move.count {
         match state.stacks[to_move.from - 1].pop() {
             Some(item) => state.stacks[to_move.to - 1].push(item),
-            None => todo!(),
+            None => return Err(String::from("Stack is empty")),
         }
     }
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -58,6 +61,6 @@ mod tests {
             "move 1 from 1 to 2".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), String::from("CMZ"))
+        assert_eq!(get_answer(lines), Ok(String::from("CMZ")))
     }
 }

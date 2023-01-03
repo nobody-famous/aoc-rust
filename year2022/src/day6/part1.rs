@@ -20,27 +20,27 @@ mod tests {
     fn sample_1() {
         let lines: Vec<String> = vec!["bvwbjplbgvbhsrlpgdmjqwftvncz".to_string()];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), 5)
+        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(5))
     }
 
     #[test]
     fn sample_2() {
         let lines: Vec<String> = vec!["nppdvjthqldpwncqszvftbrmjlhg".to_string()];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), 6)
+        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(6))
     }
 
     #[test]
     fn sample_3() {
         let lines: Vec<String> = vec!["nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg".to_string()];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), 10)
+        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(10))
     }
 
     #[test]
     fn sample_4() {
         let lines: Vec<String> = vec!["zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw".to_string()];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), 11)
+        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(11))
     }
 }

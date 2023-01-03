@@ -6,8 +6,8 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> isize {
-    let ops = parse(lines);
+fn get_answer(lines: Vec<String>) -> Result<isize, String> {
+    let ops = parse(lines)?;
     let mut strength: isize = 0;
 
     exec(&ops, |cycle, x| match cycle {
@@ -17,7 +17,7 @@ fn get_answer(lines: Vec<String>) -> isize {
         _ => (),
     });
 
-    strength
+    Ok(strength)
 }
 
 #[cfg(test)]
@@ -175,6 +175,6 @@ mod tests {
             "noop".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 13140)
+        assert_eq!(get_answer(lines), Ok(13140))
     }
 }

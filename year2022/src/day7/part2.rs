@@ -8,8 +8,8 @@ pub fn solve() -> Result<(), String> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> usize {
-    let state = do_work(lines, pop);
+fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+    let state = do_work(lines, pop)?;
     let unused = TOTAL_SPACE - state.root;
     let answer = state
         .found
@@ -18,12 +18,12 @@ fn get_answer(lines: Vec<String>) -> usize {
         .min();
 
     match answer {
-        Some(n) => *n,
-        None => 0,
+        Some(n) => Ok(*n),
+        None => Err(String::from("No min found")),
     }
 }
 
-fn pop(state: &mut State) {
+fn pop(state: &mut State) -> Result<(), String> {
     match state.stack.pop() {
         Some(n) => {
             state.found.push(n);
@@ -31,9 +31,11 @@ fn pop(state: &mut State) {
             match state.stack.pop() {
                 Some(n1) => state.stack.push(n + n1),
                 None => state.root = n,
-            }
+            };
+
+            Ok(())
         }
-        None => todo!(),
+        None => Err(String::from("Stack is empty")),
     }
 }
 
@@ -69,6 +71,6 @@ mod tests {
             "7214296 k".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 24933642);
+        assert_eq!(get_answer(lines), Ok(24933642));
     }
 }

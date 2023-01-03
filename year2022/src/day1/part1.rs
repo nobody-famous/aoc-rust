@@ -6,12 +6,12 @@ pub fn solve() -> Result<(), String> {
     core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> u32 {
+fn get_answer(lines: Vec<String>) -> Result<u32, String> {
     let groups = utils::parse(lines);
 
     match groups.iter().max() {
-        Some(num) => *num,
-        None => 0,
+        Some(num) => Ok(*num),
+        None => Err(String::from("No max found")),
     }
 }
 
@@ -38,6 +38,6 @@ mod tests {
             "10000".to_string(),
         ];
 
-        assert_eq!(get_answer(lines), 24000)
+        assert_eq!(get_answer(lines), Ok(24000))
     }
 }
