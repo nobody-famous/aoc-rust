@@ -1,4 +1,6 @@
-use super::utils::{FILE_NAME, parse};
+use crate::day19::utils::State;
+
+use super::utils::{parse, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 0;
 
@@ -7,7 +9,11 @@ pub fn solve() -> Result<(), String> {
 }
 
 fn get_answer(lines: Vec<String>) -> Result<usize, String> {
-    parse(lines)?;
+    let blueprints = parse(lines)?;
+    let state = State::new();
+
+    println!("Blueprints: {:?}", blueprints);
+
     Err(String::from("get_answer Not Done Yet"))
 }
 

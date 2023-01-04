@@ -1,39 +1,95 @@
+use std::collections::HashMap;
+
 pub const FILE_NAME: &str = "year2022/src/day19/puzzle.txt";
 
 #[derive(Debug)]
-struct Blueprint {}
+pub struct Blueprint {
+    pub num: usize,
+    pub robots: HashMap<String, HashMap<String, usize>>,
+}
 
-pub fn parse(lines: Vec<String>) -> Result<(), String> {
+#[derive(Debug)]
+pub struct State {
+    pub ore: usize,
+    pub clay: usize,
+    pub obsidian: usize,
+    pub ore_robots: usize,
+    pub clay_robots: usize,
+    pub obsidian_robots: usize,
+}
+
+impl State {
+    pub fn new() -> Self {
+        State {
+            ore: 1,
+            clay: 0,
+            obsidian: 0,
+            ore_robots: 0,
+            clay_robots: 0,
+            obsidian_robots: 0,
+        }
+    }
+}
+
+pub fn parse(lines: Vec<String>) -> Result<Vec<Blueprint>, String> {
     let groups = group_lines(&lines);
-    let mut blueprints: Vec<()> = vec![];
+    let mut blueprints: Vec<Blueprint> = vec![];
 
     for group in &groups {
         blueprints.push(parse_blueprint(&group)?);
     }
 
-    println!("GROUPS {:?}", groups);
-    Err(String::from("parse Not Done Yet"))
+    Ok(blueprints)
 }
 
-fn parse_blueprint(group: &Vec<&String>) -> Result<(), String> {
+fn parse_blueprint(group: &Vec<&String>) -> Result<Blueprint, String> {
     let mut num: usize = 0;
+    let mut robots: HashMap<String, HashMap<String, usize>> = HashMap::new();
 
     for line in group {
         let parts: Vec<&str> = line.trim().split(' ').collect();
 
-        println!("PARTS {:?}", parts);
-
-        if parts[0] == "Blueprint" {
-            num = match parts[1].replace(":", "").parse::<usize>() {
-                Ok(n) => n,
-                Err(e) => return Err(e.to_string()),
+        match parts[0] {
+            "Blueprint" => {
+                num = match parts[1].replace(":", "").parse::<usize>() {
+                    Ok(n) => n,
+                    Err(e) => return Err(e.to_string()),
+                }
             }
+            "Each" => {
+                let robot_type = parts[1];
+                let costs = parse_costs(&parts[4..])?;
+
+                robots.insert(robot_type.to_string(), costs);
+            }
+            _ => return Err(format!("Invalid start of line: {:?}", parts[0])),
         }
     }
 
-    println!("{:?}", num);
+    Ok(Blueprint { num, robots })
+}
 
-    Err(String::from("parse_blueprint Not Done Yet"))
+fn parse_costs(input: &[&str]) -> Result<HashMap<String, usize>, String> {
+    let mut ndx = 0;
+    let mut costs: HashMap<String, usize> = HashMap::new();
+
+    while ndx < input.len() {
+        let cost = match input[ndx].parse::<usize>() {
+            Ok(c) => c,
+            Err(e) => return Err(e.to_string()),
+        };
+        let item = input[ndx + 1];
+
+        costs.insert(item.to_string(), cost);
+
+        ndx += 2;
+
+        if ndx < input.len() && input[ndx] == "and" {
+            ndx += 1;
+        }
+    }
+
+    Ok(costs)
 }
 
 fn group_lines<'a>(lines: &'a Vec<String>) -> Vec<Vec<&'a String>> {
