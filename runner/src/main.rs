@@ -4,6 +4,7 @@ use year2022::day1;
 use year2022::day10;
 use year2022::day11;
 use year2022::day16;
+use year2022::day19;
 use year2022::day2;
 use year2022::day3;
 use year2022::day4;
@@ -41,7 +42,7 @@ fn main() {
         Problem::new("day16/part2".to_string(), day16::part2::solve),
     ];
 
-    // let problems: Vec<Problem> = vec![Problem::new("day11/part2".to_string(), day11::part2::solve)];
+    let problems: Vec<Problem> = vec![Problem::new("day19/part1".to_string(), day19::part1::solve)];
 
     let total = run_all(problems) as f64 / 1e6;
 
