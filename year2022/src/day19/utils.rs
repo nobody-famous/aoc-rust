@@ -33,13 +33,8 @@ impl State {
 
 pub fn parse(lines: Vec<String>) -> Result<Vec<Blueprint>, String> {
     let groups = group_lines(&lines);
-    let mut blueprints: Vec<Blueprint> = vec![];
 
-    for group in &groups {
-        blueprints.push(parse_blueprint(&group)?);
-    }
-
-    Ok(blueprints)
+    groups.iter().map(|group| parse_blueprint(group)).collect()
 }
 
 fn parse_blueprint(group: &Vec<&String>) -> Result<Blueprint, String> {

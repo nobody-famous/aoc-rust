@@ -3,13 +3,10 @@ use std::collections::HashSet;
 pub const FILE_NAME: &str = "year2022/src/day3/puzzle.txt";
 
 pub fn get_char_set(s: &str) -> HashSet<char> {
-    let mut chars = HashSet::new();
-
-    for ch in s.chars() {
-        chars.insert(ch);
-    }
-
-    chars
+    s.chars().fold(HashSet::new(), |mut chars, ch| {
+        let _ = chars.insert(ch);
+        chars
+    })
 }
 
 pub fn priority(ch: char) -> u32 {
