@@ -5,10 +5,10 @@ pub const FILE_NAME: &str = "year2022/src/day19/puzzle.txt";
 #[derive(Debug)]
 pub struct Blueprint {
     pub num: usize,
-    pub robots: HashMap<String, HashMap<String, usize>>,
+    pub rules: HashMap<String, HashMap<String, usize>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct State {
     pub ore: usize,
     pub clay: usize,
@@ -21,10 +21,10 @@ pub struct State {
 impl State {
     pub fn new() -> Self {
         State {
-            ore: 1,
+            ore: 0,
             clay: 0,
             obsidian: 0,
-            ore_robots: 0,
+            ore_robots: 1,
             clay_robots: 0,
             obsidian_robots: 0,
         }
@@ -32,36 +32,44 @@ impl State {
 }
 
 pub fn parse(lines: Vec<String>) -> Result<Vec<Blueprint>, String> {
-    let groups = group_lines(&lines);
+    lines
+        .iter()
+        .map(|line| {
+            let parts = line.split(':').collect::<Vec<&str>>();
+            let num = parse_num(parts[0])?;
+            let rules = parse_rules(parts[1])?;
 
-    groups.iter().map(|group| parse_blueprint(group)).collect()
+            Ok(Blueprint { num, rules })
+        })
+        .collect()
 }
 
-fn parse_blueprint(group: &Vec<&String>) -> Result<Blueprint, String> {
-    let mut num: usize = 0;
-    let mut robots: HashMap<String, HashMap<String, usize>> = HashMap::new();
+fn parse_num(input: &str) -> Result<usize, String> {
+    let parts: Vec<&str> = input.trim().split(' ').collect();
 
-    for line in group {
-        let parts: Vec<&str> = line.trim().split(' ').collect();
+    match parts[1].parse::<usize>() {
+        Ok(n) => Ok(n),
+        Err(e) => return Err(e.to_string()),
+    }
+}
 
-        match parts[0] {
-            "Blueprint" => {
-                num = match parts[1].replace(":", "").parse::<usize>() {
-                    Ok(n) => n,
-                    Err(e) => return Err(e.to_string()),
-                }
-            }
-            "Each" => {
-                let robot_type = parts[1];
-                let costs = parse_costs(&parts[4..])?;
+fn parse_rules(input: &str) -> Result<HashMap<String, HashMap<String, usize>>, String> {
+    let mut rules: HashMap<String, HashMap<String, usize>> = HashMap::new();
+    let parts = input.trim().split('.').collect::<Vec<&str>>();
 
-                robots.insert(robot_type.to_string(), costs);
-            }
-            _ => return Err(format!("Invalid start of line: {:?}", parts[0])),
+    for part in parts {
+        if part.len() == 0 {
+            continue;
         }
+
+        let pieces: Vec<&str> = part.trim().split(' ').collect();
+        let name = pieces[1];
+        let costs = parse_costs(&pieces[4..])?;
+
+        rules.insert(name.to_string(), costs);
     }
 
-    Ok(Blueprint { num, robots })
+    Ok(rules)
 }
 
 fn parse_costs(input: &[&str]) -> Result<HashMap<String, usize>, String> {
@@ -85,24 +93,4 @@ fn parse_costs(input: &[&str]) -> Result<HashMap<String, usize>, String> {
     }
 
     Ok(costs)
-}
-
-fn group_lines<'a>(lines: &'a Vec<String>) -> Vec<Vec<&'a String>> {
-    let mut groups = vec![];
-    let mut cur_group = vec![];
-
-    for line in lines {
-        if line.len() == 0 {
-            groups.push(cur_group);
-            cur_group = vec![];
-        } else {
-            cur_group.push(line);
-        }
-    }
-
-    if cur_group.len() > 0 {
-        groups.push(cur_group);
-    }
-
-    groups
 }
