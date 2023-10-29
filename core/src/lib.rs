@@ -3,14 +3,16 @@ use std::{
     io::{self, BufRead},
 };
 
-pub type ProblemFn = fn() -> Result<(), String>;
+pub type DynError = dyn std::error::Error;
+pub type AocResult<T> = Result<T, Box<DynError>>;
+pub type ProblemFn = fn() -> AocResult<()>;
 pub struct Problem {
-    pub label: String,
+    pub label: &'static str,
     pub to_run: ProblemFn,
 }
 
 impl Problem {
-    pub fn new(label: String, to_run: ProblemFn) -> Self {
+    pub fn new(label: &'static str, to_run: ProblemFn) -> Self {
         Problem { label, to_run }
     }
 }
@@ -22,7 +24,7 @@ pub fn read_lines(file_name: &str) -> io::Result<Vec<String>> {
         .filter(|result| result.is_ok())
         .map(|result| match result {
             Ok(line) => line,
-            _ => "".to_string(),
+            _ => String::from(""),
         })
         .collect();
 
@@ -32,9 +34,9 @@ pub fn read_lines(file_name: &str) -> io::Result<Vec<String>> {
 pub fn do_work<T>(
     file_name: &str,
     exp_answer: T,
-    get_answer: impl Fn(Vec<String>) -> Result<T, String>,
+    get_answer: impl Fn(Vec<String>) -> AocResult<T>,
     check_answer: impl Fn(&T, &T) -> bool,
-) -> Result<(), String>
+) -> AocResult<()>
 where
     T: std::fmt::Debug,
 {
@@ -44,9 +46,9 @@ where
 
             match check_answer(&answer, &exp_answer) {
                 true => Ok(()),
-                false => Err(std::format!("Wrong answer {:?}", answer)),
+                false => Err(std::format!("Wrong answer {:?}", answer).into()),
             }
         }
-        Err(e) => Err(e.to_string()),
+        Err(e) => Err(e.into()),
     }
 }

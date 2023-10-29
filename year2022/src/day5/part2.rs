@@ -1,10 +1,12 @@
 const CORRECT_ANSWER: &str = "VLCWHTDSZ";
 
+use core::AocResult;
+
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
 use super::utils::State;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(
         FILE_NAME,
         String::from(CORRECT_ANSWER),
@@ -13,7 +15,7 @@ pub fn solve() -> Result<(), String> {
     )
 }
 
-fn get_answer(lines: Vec<String>) -> Result<String, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<String> {
     let mut state = parse(lines);
 
     for idx in 0..state.moves.len() {
@@ -47,17 +49,17 @@ mod tests {
     #[test]
     fn sample() {
         let lines: Vec<String> = vec![
-            "    [D]    ".to_string(),
-            "[N] [C]    ".to_string(),
-            "[Z] [M] [P]".to_string(),
-            " 1   2   3 ".to_string(),
-            "".to_string(),
-            "move 1 from 2 to 1".to_string(),
-            "move 3 from 1 to 3".to_string(),
-            "move 2 from 2 to 1".to_string(),
-            "move 1 from 1 to 2".to_string(),
+            String::from("    [D]    "),
+            String::from("[N] [C]    "),
+            String::from("[Z] [M] [P]"),
+            String::from(" 1   2   3 "),
+            String::from(""),
+            String::from("move 1 from 2 to 1"),
+            String::from("move 3 from 1 to 3"),
+            String::from("move 2 from 2 to 1"),
+            String::from("move 1 from 1 to 2"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(String::from("MCD")))
+        assert_eq!(get_answer(lines).unwrap(), String::from("MCD"))
     }
 }

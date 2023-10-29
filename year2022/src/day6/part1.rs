@@ -1,9 +1,11 @@
+use core::AocResult;
+
 use super::utils::{get_answer, FILE_NAME};
 
 const CORRECT_ANSWER: u32 = 1707;
 const MARKER_LENGTH: usize = 4;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(
         FILE_NAME,
         CORRECT_ANSWER,
@@ -18,29 +20,29 @@ mod tests {
 
     #[test]
     fn sample_1() {
-        let lines: Vec<String> = vec!["bvwbjplbgvbhsrlpgdmjqwftvncz".to_string()];
+        let lines: Vec<String> = vec![String::from("bvwbjplbgvbhsrlpgdmjqwftvncz")];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(5))
+        assert_eq!(get_answer(lines, MARKER_LENGTH).unwrap(), 5)
     }
 
     #[test]
     fn sample_2() {
-        let lines: Vec<String> = vec!["nppdvjthqldpwncqszvftbrmjlhg".to_string()];
+        let lines: Vec<String> = vec![String::from("nppdvjthqldpwncqszvftbrmjlhg")];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(6))
+        assert_eq!(get_answer(lines, MARKER_LENGTH).unwrap(), 6)
     }
 
     #[test]
     fn sample_3() {
-        let lines: Vec<String> = vec!["nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg".to_string()];
+        let lines: Vec<String> = vec![String::from("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(10))
+        assert_eq!(get_answer(lines, MARKER_LENGTH).unwrap(), 10)
     }
 
     #[test]
     fn sample_4() {
-        let lines: Vec<String> = vec!["zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw".to_string()];
+        let lines: Vec<String> = vec![String::from("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")];
 
-        assert_eq!(get_answer(lines, MARKER_LENGTH), Ok(11))
+        assert_eq!(get_answer(lines, MARKER_LENGTH).unwrap(), 11)
     }
 }

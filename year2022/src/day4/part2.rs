@@ -1,14 +1,16 @@
+use core::AocResult;
+
 use crate::day4::utils::parse_pair;
 
 use super::utils::{Pair, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 921;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     Ok(lines.iter().map(parse_pair).filter(does_overlap).count())
 }
 
@@ -24,14 +26,14 @@ mod tests {
     #[test]
     fn sample() {
         let lines: Vec<String> = vec![
-            "2-4,6-8".to_string(),
-            "2-3,4-5".to_string(),
-            "5-7,7-9".to_string(),
-            "2-8,3-7".to_string(),
-            "6-6,4-6".to_string(),
-            "2-6,4-8".to_string(),
+            String::from("2-4,6-8"),
+            String::from("2-3,4-5"),
+            String::from("5-7,7-9"),
+            String::from("2-8,3-7"),
+            String::from("6-6,4-6"),
+            String::from("2-6,4-8"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(4))
+        assert_eq!(get_answer(lines).unwrap(), 4)
     }
 }

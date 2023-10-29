@@ -1,18 +1,18 @@
+use core::AocResult;
+
 use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 51075;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let mut monkeys = parse(lines)?;
 
     for _ in 0..20 {
-        if let Some(e) = round(&mut monkeys, &update_worry).err() {
-            return Err(e);
-        }
+        round(&mut monkeys, &update_worry)?;
     }
 
     let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
@@ -23,7 +23,7 @@ fn get_answer(lines: Vec<String>) -> Result<usize, String> {
     Ok(inspected.iter().take(2).product())
 }
 
-fn update_worry(monkey: &Monkey, item: usize) -> Result<usize, String> {
+fn update_worry(monkey: &Monkey, item: usize) -> AocResult<usize> {
     let left = match monkey.op.left {
         Arg::Value(v) => v,
         Arg::Old => item,
@@ -36,7 +36,7 @@ fn update_worry(monkey: &Monkey, item: usize) -> Result<usize, String> {
     match monkey.op.op {
         '*' => Ok((left * right) / 3),
         '+' => Ok((left + right) / 3),
-        _ => Err(format!("Invalid operation: {:?}", monkey.op.op)),
+        _ => Err(format!("Invalid operation: {:?}", monkey.op.op).into()),
     }
 }
 
@@ -47,35 +47,35 @@ mod tests {
     #[test]
     fn sample() {
         let lines = vec![
-            "Monkey 0:".to_string(),
-            "    Starting items: 79, 98".to_string(),
-            "    Operation: new = old * 19".to_string(),
-            "    Test: divisible by 23".to_string(),
-            "        If true: throw to monkey 2".to_string(),
-            "        If false: throw to monkey 3".to_string(),
-            "".to_string(),
-            "Monkey 1:".to_string(),
-            "    Starting items: 54, 65, 75, 74".to_string(),
-            "    Operation: new = old + 6".to_string(),
-            "    Test: divisible by 19".to_string(),
-            "        If true: throw to monkey 2".to_string(),
-            "        If false: throw to monkey 0".to_string(),
-            "".to_string(),
-            "Monkey 2:".to_string(),
-            "    Starting items: 79, 60, 97".to_string(),
-            "    Operation: new = old * old".to_string(),
-            "    Test: divisible by 13".to_string(),
-            "        If true: throw to monkey 1".to_string(),
-            "        If false: throw to monkey 3".to_string(),
-            "".to_string(),
-            "Monkey 3:".to_string(),
-            "    Starting items: 74".to_string(),
-            "    Operation: new = old + 3".to_string(),
-            "    Test: divisible by 17".to_string(),
-            "        If true: throw to monkey 0".to_string(),
-            "        If false: throw to monkey 1".to_string(),
+            String::from("Monkey 0:"),
+            String::from("    Starting items: 79, 98"),
+            String::from("    Operation: new = old * 19"),
+            String::from("    Test: divisible by 23"),
+            String::from("        If true: throw to monkey 2"),
+            String::from("        If false: throw to monkey 3"),
+            String::from(""),
+            String::from("Monkey 1:"),
+            String::from("    Starting items: 54, 65, 75, 74"),
+            String::from("    Operation: new = old + 6"),
+            String::from("    Test: divisible by 19"),
+            String::from("        If true: throw to monkey 2"),
+            String::from("        If false: throw to monkey 0"),
+            String::from(""),
+            String::from("Monkey 2:"),
+            String::from("    Starting items: 79, 60, 97"),
+            String::from("    Operation: new = old * old"),
+            String::from("    Test: divisible by 13"),
+            String::from("        If true: throw to monkey 1"),
+            String::from("        If false: throw to monkey 3"),
+            String::from(""),
+            String::from("Monkey 3:"),
+            String::from("    Starting items: 74"),
+            String::from("    Operation: new = old + 3"),
+            String::from("    Test: divisible by 17"),
+            String::from("        If true: throw to monkey 0"),
+            String::from("        If false: throw to monkey 1"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(10605))
+        assert_eq!(get_answer(lines).unwrap(), 10605)
     }
 }

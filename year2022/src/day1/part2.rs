@@ -1,12 +1,14 @@
 const CORRECT_ANSWER: u32 = 197400;
 
+use core::AocResult;
+
 use crate::day1::utils;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<u32, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<u32> {
     let mut groups = utils::parse(lines);
 
     groups.sort_by(|a, b| b.cmp(a));
@@ -20,22 +22,22 @@ mod tests {
     #[test]
     fn sample() {
         let lines: Vec<String> = vec![
-            "1000".to_string(),
-            "2000".to_string(),
-            "3000".to_string(),
-            "".to_string(),
-            "4000".to_string(),
-            "".to_string(),
-            "5000".to_string(),
-            "6000".to_string(),
-            "".to_string(),
-            "7000".to_string(),
-            "8000".to_string(),
-            "9000".to_string(),
-            "".to_string(),
-            "10000".to_string(),
+            String::from("1000"),
+            String::from("2000"),
+            String::from("3000"),
+            String::from(""),
+            String::from("4000"),
+            String::from(""),
+            String::from("5000"),
+            String::from("6000"),
+            String::from(""),
+            String::from("7000"),
+            String::from("8000"),
+            String::from("9000"),
+            String::from(""),
+            String::from("10000"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(45000))
+        assert_eq!(get_answer(lines).unwrap(), 45000)
     }
 }

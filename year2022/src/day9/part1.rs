@@ -1,14 +1,16 @@
+use core::AocResult;
+
 use crate::day9::utils::{do_move, State};
 
 use super::utils::{parse_move, Move, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 6311;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let mut moves: Vec<Move> = vec![];
     let mut state = State::new(2);
 
@@ -34,16 +36,16 @@ mod tests {
     #[test]
     fn sample() {
         let lines: Vec<String> = vec![
-            "R 4".to_string(),
-            "U 4".to_string(),
-            "L 3".to_string(),
-            "D 1".to_string(),
-            "R 4".to_string(),
-            "D 1".to_string(),
-            "L 5".to_string(),
-            "R 2".to_string(),
+            String::from("R 4"),
+            String::from("U 4"),
+            String::from("L 3"),
+            String::from("D 1"),
+            String::from("R 4"),
+            String::from("D 1"),
+            String::from("L 5"),
+            String::from("R 2"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(13))
+        assert_eq!(get_answer(lines).unwrap(), 13)
     }
 }
