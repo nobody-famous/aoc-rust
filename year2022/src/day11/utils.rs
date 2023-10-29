@@ -1,3 +1,4 @@
+use core::AocResult;
 use std::collections::HashMap;
 
 use regex::Regex;
@@ -29,8 +30,8 @@ pub struct Monkey {
 
 pub fn round(
     monkeys: &mut HashMap<usize, Monkey>,
-    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> Result<usize, String>,
-) -> Result<(), String> {
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> AocResult<usize>,
+) -> AocResult<()> {
     for ndx in 0..monkeys.len() {
         if let Some(monkey) = monkeys.get_mut(&ndx) {
             let to_throw = process_monkey(monkey, update_worry)?;
@@ -38,7 +39,7 @@ pub fn round(
             for (ndx, worries) in to_throw {
                 let target = match monkeys.get_mut(&ndx) {
                     Some(t) => t,
-                    None => return Err(format!("Could not find entry for index {:?}", ndx)),
+                    None => return Err(format!("Could not find entry for index {:?}", ndx).into()),
                 };
 
                 for worry in worries {
@@ -46,7 +47,7 @@ pub fn round(
                 }
             }
         } else {
-            return Err(format!("Could not find entry for index {:?}", ndx));
+            return Err(format!("Could not find entry for index {:?}", ndx).into());
         }
     }
 
@@ -55,8 +56,8 @@ pub fn round(
 
 fn process_monkey(
     monkey: &mut Monkey,
-    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> Result<usize, String>,
-) -> Result<HashMap<usize, Vec<usize>>, String> {
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> AocResult<usize>,
+) -> AocResult<HashMap<usize, Vec<usize>>> {
     let mut to_throw = HashMap::new();
 
     for item in &monkey.items {

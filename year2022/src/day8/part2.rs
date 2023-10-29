@@ -1,12 +1,14 @@
+use core::AocResult;
+
 use super::utils::{parse_rows, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 595080;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<usize, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let rows = parse_rows(lines);
     let mut high: usize = 0;
 
@@ -67,13 +69,13 @@ mod tests {
     #[test]
     fn sample() {
         let lines: Vec<String> = vec![
-            "30373".to_string(),
-            "25512".to_string(),
-            "65332".to_string(),
-            "33549".to_string(),
-            "35390".to_string(),
+            String::from("30373"),
+            String::from("25512"),
+            String::from("65332"),
+            String::from("33549"),
+            String::from("35390"),
         ];
 
-        assert_eq!(get_answer(lines), Ok(8))
+        assert_eq!(get_answer(lines).unwrap(), 8)
     }
 }

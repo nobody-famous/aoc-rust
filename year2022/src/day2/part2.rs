@@ -1,12 +1,14 @@
+use core::AocResult;
+
 use super::utils;
 
 const CORRECT_ANSWER: u32 = 8295;
 
-pub fn solve() -> Result<(), String> {
+pub fn solve() -> AocResult<()> {
     core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> Result<u32, String> {
+fn get_answer(lines: Vec<String>) -> AocResult<u32> {
     Ok(lines.iter().map(|line| round_score(line)).sum::<u32>())
 }
 
@@ -31,8 +33,12 @@ mod tests {
 
     #[test]
     fn sample() {
-        let lines: Vec<String> = vec!["A Y".to_string(), "B X".to_string(), "C Z".to_string()];
+        let lines: Vec<String> = vec![
+            String::from("A Y"),
+            String::from("B X"),
+            String::from("C Z"),
+        ];
 
-        assert_eq!(get_answer(lines), Ok(12))
+        assert_eq!(get_answer(lines).unwrap(), 12)
     }
 }

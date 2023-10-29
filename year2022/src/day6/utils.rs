@@ -1,6 +1,8 @@
+use core::AocResult;
+
 pub const FILE_NAME: &str = "year2022/src/day6/puzzle.txt";
 
-pub fn get_answer(lines: Vec<String>, length: usize) -> Result<u32, String> {
+pub fn get_answer(lines: Vec<String>, length: usize) -> AocResult<u32> {
     let line: &String = &lines[0];
     let mut idx = 0;
 
@@ -11,7 +13,7 @@ pub fn get_answer(lines: Vec<String>, length: usize) -> Result<u32, String> {
         }
     }
 
-    Err(String::from("Not found"))
+    Err("Not found".into())
 }
 
 fn find_dupe(line: &String, start: usize, count: usize) -> Option<usize> {
