@@ -73,7 +73,113 @@ mod tests {
 
     #[test]
     fn sample() {
-        // shortest_path(1, 5, graph);
-        assert!(false, "Not done yet")
+        let graph = HashMap::from([
+            (
+                1,
+                vec![
+                    Edge {
+                        target: 2,
+                        weight: 7,
+                    },
+                    Edge {
+                        target: 3,
+                        weight: 9,
+                    },
+                    Edge {
+                        target: 6,
+                        weight: 14,
+                    },
+                ],
+            ),
+            (
+                2,
+                vec![
+                    Edge {
+                        target: 1,
+                        weight: 7,
+                    },
+                    Edge {
+                        target: 3,
+                        weight: 10,
+                    },
+                    Edge {
+                        target: 4,
+                        weight: 15,
+                    },
+                ],
+            ),
+            (
+                3,
+                vec![
+                    Edge {
+                        target: 1,
+                        weight: 9,
+                    },
+                    Edge {
+                        target: 2,
+                        weight: 10,
+                    },
+                    Edge {
+                        target: 4,
+                        weight: 11,
+                    },
+                    Edge {
+                        target: 6,
+                        weight: 2,
+                    },
+                ],
+            ),
+            (
+                4,
+                vec![
+                    Edge {
+                        target: 2,
+                        weight: 15,
+                    },
+                    Edge {
+                        target: 3,
+                        weight: 11,
+                    },
+                    Edge {
+                        target: 5,
+                        weight: 6,
+                    },
+                ],
+            ),
+            (
+                5,
+                vec![
+                    Edge {
+                        target: 4,
+                        weight: 6,
+                    },
+                    Edge {
+                        target: 6,
+                        weight: 9,
+                    },
+                ],
+            ),
+            (
+                6,
+                vec![
+                    Edge {
+                        target: 1,
+                        weight: 14,
+                    },
+                    Edge {
+                        target: 3,
+                        weight: 2,
+                    },
+                    Edge {
+                        target: 5,
+                        weight: 9,
+                    },
+                ],
+            ),
+        ]);
+
+        let (_, weight) = shortest_path(1, 5, graph);
+
+        assert_eq!(20, weight);
     }
 }

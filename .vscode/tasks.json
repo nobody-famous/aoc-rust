@@ -30,7 +30,7 @@
             "command": "cargo",
             "args": [
                 "test",
-                "graph::tests",
+                "graph::shortest_path::tests",
             ],
             "problemMatcher": [
                 "$rustc"
