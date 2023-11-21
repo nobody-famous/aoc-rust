@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct Position {
     pub row: usize,
     pub col: usize,
@@ -19,8 +19,34 @@ pub struct Grid {
     pub cells: HashMap<Position, char>,
 }
 
-pub fn parse(lines: Vec<String>) -> Vec<Cell> {
-    lines_to_cells(lines)
+pub fn parse(lines: Vec<String>) -> Grid {
+    lines_to_cells(lines).iter().fold(
+        Grid {
+            start: Position { row: 0, col: 0 },
+            end: Position { row: 0, col: 0 },
+            cells: HashMap::new(),
+        },
+        |mut grid, elem| match elem.value {
+            'S' => {
+                grid.cells.insert(elem.pos.clone(), 'a');
+                Grid {
+                    start: elem.pos.clone(),
+                    ..grid
+                }
+            }
+            'E' => {
+                grid.cells.insert(elem.pos.clone(), 'z');
+                Grid {
+                    end: elem.pos.clone(),
+                    ..grid
+                }
+            }
+            _ => {
+                grid.cells.insert(elem.pos.clone(), elem.value);
+                grid
+            }
+        },
+    )
 }
 
 fn lines_to_cells(lines: Vec<String>) -> Vec<Cell> {
@@ -55,9 +81,10 @@ mod tests {
             String::from("abdefghi"),
         ];
 
-        let cells = parse(lines);
-        cells.iter().for_each(|cell| println!("{:?}", cell));
+        let grid = parse(lines);
 
-        assert!(false, "Not done yet")
+        assert_eq!(grid.start, Position { row: 0, col: 0 });
+        assert_eq!(grid.end, Position { row: 2, col: 5 });
+        assert_eq!(grid.cells.len(), 40);
     }
 }
