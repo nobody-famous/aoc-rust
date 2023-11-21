@@ -1,14 +1,14 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{get_char_set, priority, FILE_NAME};
 
 const CORRECT_ANSWER: u32 = 8039;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<u32> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<u32> {
     Ok(lines
         .iter()
         .map(|line| line.split_at(line.len() / 2))

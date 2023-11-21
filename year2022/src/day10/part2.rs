@@ -1,4 +1,4 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{exec, parse, FILE_NAME};
 
@@ -8,11 +8,11 @@ const SCREEN_WIDTH: usize = 40;
 
 type Screen = [[u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<&'static str> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<&'static str> {
     let ops = parse(lines)?;
     let mut screen: Screen = [[0u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
     let mut pixel = 0;

@@ -1,13 +1,13 @@
 const CORRECT_ANSWER: &str = "TBVFVDZPN";
 
-use core::AocResult;
+use aoc::ProblemResult;
 
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
 use super::utils::State;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(
         FILE_NAME,
         String::from(CORRECT_ANSWER),
         get_answer,
@@ -15,7 +15,7 @@ pub fn solve() -> AocResult<()> {
     )
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<String> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<String> {
     let mut state = parse(lines);
 
     for idx in 0..state.moves.len() {

@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 regex = "1"
-core = { path = "../core" }
+aoc = { path = "../aoc" }

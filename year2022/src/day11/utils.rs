@@ -1,4 +1,4 @@
-use core::AocResult;
+use aoc::ProblemResult;
 use std::collections::HashMap;
 
 use regex::Regex;
@@ -30,8 +30,8 @@ pub struct Monkey {
 
 pub fn round(
     monkeys: &mut HashMap<usize, Monkey>,
-    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> AocResult<usize>,
-) -> AocResult<()> {
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> ProblemResult<usize>,
+) -> ProblemResult<()> {
     for ndx in 0..monkeys.len() {
         if let Some(monkey) = monkeys.get_mut(&ndx) {
             let to_throw = process_monkey(monkey, update_worry)?;
@@ -56,8 +56,8 @@ pub fn round(
 
 fn process_monkey(
     monkey: &mut Monkey,
-    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> AocResult<usize>,
-) -> AocResult<HashMap<usize, Vec<usize>>> {
+    update_worry: &dyn for<'a> Fn(&'a Monkey, usize) -> ProblemResult<usize>,
+) -> ProblemResult<HashMap<usize, Vec<usize>>> {
     let mut to_throw = HashMap::new();
 
     for item in &monkey.items {

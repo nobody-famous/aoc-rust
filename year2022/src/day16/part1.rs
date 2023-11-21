@@ -1,14 +1,14 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{get_mask, parse, walk, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1716;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<usize> {
     let config = parse(lines)?;
     let start = get_mask(&config.masks, &"AA".to_string())?;
     let flows = walk(&config, start, 30)?;

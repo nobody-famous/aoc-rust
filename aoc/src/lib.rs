@@ -6,8 +6,8 @@ use std::{
 pub mod graph;
 
 pub type DynError = dyn std::error::Error;
-pub type AocResult<T> = Result<T, Box<DynError>>;
-pub type ProblemFn = fn() -> AocResult<()>;
+pub type ProblemResult<T> = Result<T, Box<DynError>>;
+pub type ProblemFn = fn() -> ProblemResult<()>;
 pub struct Problem {
     pub label: &'static str,
     pub to_run: ProblemFn,
@@ -36,9 +36,9 @@ pub fn read_lines(file_name: &str) -> io::Result<Vec<String>> {
 pub fn do_work<T>(
     file_name: &str,
     exp_answer: T,
-    get_answer: impl Fn(Vec<String>) -> AocResult<T>,
+    get_answer: impl Fn(Vec<String>) -> ProblemResult<T>,
     check_answer: impl Fn(&T, &T) -> bool,
-) -> AocResult<()>
+) -> ProblemResult<()>
 where
     T: std::fmt::Debug,
 {

@@ -1,4 +1,4 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{do_work, State, FILE_NAME};
 
@@ -6,11 +6,11 @@ const CORRECT_ANSWER: usize = 10096985;
 const TOTAL_SPACE: usize = 70000000;
 const TARGET_SPACE: usize = 30000000;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<usize> {
     let state = do_work(lines, pop)?;
     let unused = TOTAL_SPACE - state.root;
     let answer = state
@@ -25,7 +25,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     }
 }
 
-fn pop(state: &mut State) -> AocResult<()> {
+fn pop(state: &mut State) -> ProblemResult<()> {
     match state.stack.pop() {
         Some(n) => {
             state.found.push(n);

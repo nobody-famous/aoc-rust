@@ -1,12 +1,12 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{get_answer, FILE_NAME};
 
 const CORRECT_ANSWER: u32 = 1707;
 const MARKER_LENGTH: usize = 4;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(
         FILE_NAME,
         CORRECT_ANSWER,
         |lines| get_answer(lines, MARKER_LENGTH),

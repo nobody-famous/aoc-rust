@@ -1,4 +1,4 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 pub const FILE_NAME: &str = "year2022/src/day7/puzzle.txt";
 
@@ -19,7 +19,7 @@ impl State {
     }
 }
 
-pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> AocResult<()>) -> AocResult<State> {
+pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> ProblemResult<()>) -> ProblemResult<State> {
     let mut state = State::new();
 
     for line in lines {
@@ -55,7 +55,7 @@ fn handle_file(state: &mut State, line: String) -> Result<(), String> {
     }
 }
 
-fn cmd(state: &mut State, line: String, pop: fn(&mut State) -> AocResult<()>) -> AocResult<()> {
+fn cmd(state: &mut State, line: String, pop: fn(&mut State) -> ProblemResult<()>) -> ProblemResult<()> {
     let parts: Vec<&str> = line.split(' ').collect();
 
     match (parts.get(1), parts.get(2)) {

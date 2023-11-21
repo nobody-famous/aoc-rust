@@ -1,20 +1,20 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{do_work, State, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 1501149;
 const TARGET: usize = 100000;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<usize> {
     let state = do_work(lines, pop)?;
     Ok(state.found.iter().sum::<usize>())
 }
 
-fn pop(state: &mut State) -> AocResult<()> {
+fn pop(state: &mut State) -> ProblemResult<()> {
     match state.stack.pop() {
         Some(n) => {
             if n <= TARGET {

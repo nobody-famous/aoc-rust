@@ -1,11 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-pub struct Edge<Pos, W> {
-    pub target: Pos,
-    pub weight: W,
-}
-
-pub type Graph<Pos, W> = HashMap<Pos, Vec<Edge<Pos, W>>>;
+use super::{Edge, Graph};
 
 struct PathNode<'a, Pos, W> {
     pos: &'a Pos,
@@ -70,4 +65,15 @@ where
 {
     let state: State<Pos, W> = init_state(&start, &graph);
     (vec![], W::default())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sample() {
+        // shortest_path(1, 5, graph);
+        assert!(false, "Not done yet")
+    }
 }

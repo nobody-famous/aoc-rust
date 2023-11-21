@@ -1,6 +1,6 @@
 [workspace]
 members = [
     "runner",
-    "core",
+    "aoc",
     "year2022",
 ]

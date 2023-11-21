@@ -1,14 +1,14 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 51075;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<usize> {
     let mut monkeys = parse(lines)?;
 
     for _ in 0..20 {
@@ -23,7 +23,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     Ok(inspected.iter().take(2).product())
 }
 
-fn update_worry(monkey: &Monkey, item: usize) -> AocResult<usize> {
+fn update_worry(monkey: &Monkey, item: usize) -> ProblemResult<usize> {
     let left = match monkey.op.left {
         Arg::Value(v) => v,
         Arg::Old => item,

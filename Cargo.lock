@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "core"
+name = "aoc"
 version = "0.1.0"
 
 [[package]]
@@ -42,7 +42,7 @@ checksum = "456c603be3e8d448b072f410900c09faf164fbce2d480456f50eea6e25f9c848"
 name = "runner"
 version = "0.1.0"
 dependencies = [
- "core",
+ "aoc",
  "year2022",
 ]
 
@@ -50,6 +50,6 @@ dependencies = [
 name = "year2022"
 version = "0.1.0"
 dependencies = [
- "core",
+ "aoc",
  "regex",
 ]

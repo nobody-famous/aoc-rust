@@ -1,4 +1,4 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use crate::day9::utils::{do_move, State};
 
@@ -6,11 +6,11 @@ use super::utils::{parse_move, Move, FILE_NAME};
 
 const CORRECT_ANSWER: usize = 6311;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<usize> {
     let mut moves: Vec<Move> = vec![];
     let mut state = State::new(2);
 

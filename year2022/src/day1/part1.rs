@@ -1,14 +1,14 @@
 const CORRECT_ANSWER: u32 = 69206;
 
-use core::AocResult;
+use aoc::ProblemResult;
 
 use crate::day1::utils;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<u32> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<u32> {
     let groups = utils::parse(lines);
 
     match groups.iter().max() {

@@ -1,4 +1,4 @@
-use core::Problem;
+use aoc::Problem;
 use std::time;
 use year2022::day1;
 use year2022::day10;

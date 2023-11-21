@@ -1,14 +1,14 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils;
 
 const CORRECT_ANSWER: u32 = 8295;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(utils::FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<u32> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<u32> {
     Ok(lines.iter().map(|line| round_score(line)).sum::<u32>())
 }
 

@@ -1,14 +1,14 @@
-use core::AocResult;
+use aoc::ProblemResult;
 
 use super::utils::{exec, parse, FILE_NAME};
 
 const CORRECT_ANSWER: isize = 15880;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> ProblemResult<()> {
+    aoc::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
 }
 
-fn get_answer(lines: Vec<String>) -> AocResult<isize> {
+fn get_answer(lines: Vec<String>) -> ProblemResult<isize> {
     let ops = parse(lines)?;
     let mut strength: isize = 0;
 
