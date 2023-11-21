@@ -3,6 +3,8 @@ use std::{
     io::{self, BufRead},
 };
 
+pub mod graph;
+
 pub type DynError = dyn std::error::Error;
 pub type AocResult<T> = Result<T, Box<DynError>>;
 pub type ProblemFn = fn() -> AocResult<()>;
