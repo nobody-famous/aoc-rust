@@ -1,4 +1,5 @@
 use core::AocResult;
+use std::cmp;
 
 use super::utils::{parse_rows, FILE_NAME};
 
@@ -14,10 +15,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
 
     for row in 1..rows.len() - 1 {
         for col in 1..rows[0].len() - 1 {
-            let score = get_score(&rows, row, col);
-            if score > high {
-                high = score;
-            }
+            high = cmp::max(high, get_score(&rows, row, col));
         }
     }
 
