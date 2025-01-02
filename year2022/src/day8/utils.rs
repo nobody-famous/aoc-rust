@@ -14,9 +14,8 @@ fn parse_row(line: &str) -> Vec<usize> {
     })
 }
 
-pub fn create_visible(rows: &Vec<Vec<usize>>) -> Vec<Vec<bool>> {
+pub fn create_visible(rows: &[Vec<usize>]) -> Vec<Vec<bool>> {
     let mut visible: Vec<Vec<bool>> = rows
-        .clone()
         .iter()
         .map(|row| row.clone().iter().map(|_| false).collect())
         .collect();
@@ -25,7 +24,7 @@ pub fn create_visible(rows: &Vec<Vec<usize>>) -> Vec<Vec<bool>> {
     visible
 }
 
-fn set_boundary(visible: &mut Vec<Vec<bool>>) {
+fn set_boundary(visible: &mut [Vec<bool>]) {
     let idx = visible.len() - 1;
 
     visible[0] = visible[0].iter().map(|_| true).collect();

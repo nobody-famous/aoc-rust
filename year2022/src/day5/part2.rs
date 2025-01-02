@@ -1,18 +1,11 @@
-const CORRECT_ANSWER: &str = "VLCWHTDSZ";
-
 use core::AocResult;
 
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
 use super::utils::State;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
-        FILE_NAME,
-        String::from(CORRECT_ANSWER),
-        get_answer,
-        |a, b| a.eq(b),
-    )
+pub fn solve() -> AocResult<String> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<String> {
@@ -35,9 +28,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<String> {
 fn do_move(state: &mut State, idx: usize) {
     let to_do = &state.moves[idx];
     let size = state.stacks[to_do.from - 1].len();
-    let mut to_move: Vec<char> = state.stacks[to_do.from - 1]
-        .drain(size - to_do.count..)
-        .collect();
+    let mut to_move: Vec<char> = state.stacks[to_do.from - 1].drain(size - to_do.count..).collect();
 
     state.stacks[to_do.to - 1].append(&mut to_move);
 }

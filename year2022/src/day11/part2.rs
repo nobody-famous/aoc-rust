@@ -2,15 +2,13 @@ use core::AocResult;
 
 use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 11741456163;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let mut monkeys = parse(lines)?;
-    let mod_value: usize = monkeys.iter().map(|(_, m)| m.test).product();
+    let mod_value: usize = monkeys.values().map(|m| m.test).product();
 
     for _ in 0..10000 {
         if let Some(e) = round(&mut monkeys, &|monkey: &Monkey, item| {
@@ -35,7 +33,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
         }
     }
 
-    let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
+    let mut inspected: Vec<usize> = monkeys.values().map(|m| m.inspected).collect();
 
     inspected.sort();
     inspected.reverse();

@@ -22,7 +22,7 @@ impl Move {
     }
 }
 
-pub fn parse_move(line: &String) -> Result<Move, String> {
+pub fn parse_move(line: &str) -> Result<Move, String> {
     let parts: Vec<&str> = line.split(' ').collect();
     let dir = parse_dir(parts[0])?;
     let dist = parse_dist(parts[1])?;

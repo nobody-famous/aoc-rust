@@ -19,6 +19,12 @@ impl State {
     }
 }
 
+impl Default for State {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> AocResult<()>) -> AocResult<State> {
     let mut state = State::new();
 
@@ -40,7 +46,7 @@ pub fn do_work(lines: Vec<String>, pop: fn(&mut State) -> AocResult<()>) -> AocR
 fn handle_file(state: &mut State, line: String) -> Result<(), String> {
     let parts: Vec<&str> = line.split(' ').collect();
 
-    match parts.get(0) {
+    match parts.first() {
         Some(s) => match s.parse::<usize>() {
             Ok(n) => match state.stack.pop() {
                 Some(item) => {

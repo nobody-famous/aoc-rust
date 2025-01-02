@@ -4,14 +4,16 @@ use crate::day4::utils::parse_pair;
 
 use super::utils::{Pair, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 490;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
-    Ok(lines.iter().map(parse_pair).filter(does_overlap).count())
+    Ok(lines
+        .iter()
+        .map(|line| parse_pair(line))
+        .filter(does_overlap)
+        .count())
 }
 
 fn does_overlap(pair: &Pair) -> bool {

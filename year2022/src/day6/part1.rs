@@ -2,16 +2,10 @@ use core::AocResult;
 
 use super::utils::{get_answer, FILE_NAME};
 
-const CORRECT_ANSWER: u32 = 1707;
 const MARKER_LENGTH: usize = 4;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
-        FILE_NAME,
-        CORRECT_ANSWER,
-        |lines| get_answer(lines, MARKER_LENGTH),
-        |a, b| a == b,
-    )
+pub fn solve() -> AocResult<u32> {
+    core::do_work(FILE_NAME, |lines| get_answer(lines, MARKER_LENGTH))
 }
 
 #[cfg(test)]

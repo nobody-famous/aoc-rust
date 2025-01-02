@@ -2,14 +2,13 @@ use core::AocResult;
 
 use super::utils::{exec, parse, FILE_NAME};
 
-const CORRECT_ANSWER: &str = "PLGFKAZG";
 const SCREEN_HEIGHT: usize = 6;
 const SCREEN_WIDTH: usize = 40;
 
 type Screen = [[u8; SCREEN_WIDTH]; SCREEN_HEIGHT];
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<&'static str> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<&'static str> {

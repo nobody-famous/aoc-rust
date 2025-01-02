@@ -61,16 +61,14 @@ fn process_monkey(
     let mut to_throw = HashMap::new();
 
     for item in &monkey.items {
-        let new_worry = update_worry(&monkey, *item)?;
+        let new_worry = update_worry(monkey, *item)?;
         let target_ndx = if new_worry % monkey.test == 0 {
             monkey.op.true_target
         } else {
             monkey.op.false_target
         };
 
-        if !to_throw.contains_key(&target_ndx) {
-            to_throw.insert(target_ndx, vec![]);
-        }
+        to_throw.entry(target_ndx).or_insert_with(Vec::new);
 
         let v = get_to_throw_value(&mut to_throw, target_ndx)?;
 
@@ -144,7 +142,7 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
                 for cap in op.captures_iter(&line) {
                     let left = parse_arg(&cap[1])?;
                     let right = parse_arg(&cap[3])?;
-                    let op_str = &cap[2].chars().nth(0);
+                    let op_str = &cap[2].chars().next();
                     let op = op_str.ok_or("Could not find op string")?;
 
                     cur_op = Operation {
@@ -170,7 +168,7 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
                         return Err(format!("Invalid condition: {:?}", line));
                     }
                 }
-            } else if line.len() == 0 {
+            } else if line.is_empty() {
                 monkey_map.insert(
                     cur_monkey,
                     Monkey {

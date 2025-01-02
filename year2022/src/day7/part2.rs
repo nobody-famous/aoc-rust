@@ -2,12 +2,11 @@ use core::AocResult;
 
 use super::utils::{do_work, State, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 10096985;
 const TOTAL_SPACE: usize = 70000000;
 const TARGET_SPACE: usize = 30000000;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {

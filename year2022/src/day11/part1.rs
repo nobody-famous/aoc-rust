@@ -2,10 +2,8 @@ use core::AocResult;
 
 use super::utils::{parse, round, Arg, Monkey, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 51075;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
@@ -15,7 +13,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
         round(&mut monkeys, &update_worry)?;
     }
 
-    let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
+    let mut inspected: Vec<usize> = monkeys.values().map(|m| m.inspected).collect();
 
     inspected.sort();
     inspected.reverse();

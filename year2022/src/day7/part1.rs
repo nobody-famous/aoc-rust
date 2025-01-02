@@ -2,11 +2,10 @@ use core::AocResult;
 
 use super::utils::{do_work, State, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 1501149;
 const TARGET: usize = 100000;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
@@ -21,9 +20,8 @@ fn pop(state: &mut State) -> AocResult<()> {
                 state.found.push(n);
             }
 
-            match state.stack.pop() {
-                Some(n1) => state.stack.push(n + n1),
-                None => (),
+            if let Some(n1) = state.stack.pop() {
+                state.stack.push(n + n1)
             };
 
             Ok(())

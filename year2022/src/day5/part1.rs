@@ -1,18 +1,11 @@
-const CORRECT_ANSWER: &str = "TBVFVDZPN";
-
 use core::AocResult;
 
 use crate::{day5::utils::parse, day5::utils::FILE_NAME};
 
 use super::utils::State;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
-        FILE_NAME,
-        String::from(CORRECT_ANSWER),
-        get_answer,
-        |a, b| a.eq(b),
-    )
+pub fn solve() -> AocResult<String> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<String> {

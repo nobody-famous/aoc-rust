@@ -8,7 +8,7 @@ pub enum Op {
 
 pub fn exec<F>(ops: &Vec<Op>, mut obs: F)
 where
-    F: FnMut(usize, isize) -> (),
+    F: FnMut(usize, isize),
 {
     let mut cycle = 0;
     let mut x = 1;
@@ -42,7 +42,7 @@ pub fn parse(lines: Vec<String>) -> Result<Vec<Op>, String> {
                 Err(_) => return Err(format!("Could not parse {:?}", parts[1])),
             }
         } else {
-            0 as isize
+            0
         };
 
         let to_add = if parts[0] == "addx" {

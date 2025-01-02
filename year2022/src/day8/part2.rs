@@ -1,63 +1,52 @@
 use core::AocResult;
+use std::cmp;
 
 use super::utils::{parse_rows, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 595080;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let rows = parse_rows(lines);
-    let mut high: usize = 0;
 
-    for row in 1..rows.len() - 1 {
-        for col in 1..rows[0].len() - 1 {
-            let score = get_score(&rows, row, col);
-            if score > high {
-                high = score;
-            }
-        }
-    }
+    let high = rows.iter().enumerate().fold(0, |acc, (row, _)| {
+        cmp::max(
+            acc,
+            rows[0]
+                .iter()
+                .enumerate()
+                .fold(0, |acc, (col, _)| cmp::max(acc, get_score(&rows, row, col))),
+        )
+    });
 
     Ok(high)
 }
 
-fn get_score(rows: &Vec<Vec<usize>>, row: usize, col: usize) -> usize {
+fn get_score(rows: &[Vec<usize>], row: usize, col: usize) -> usize {
     let target = rows[row][col];
-    let mut north = 0;
-    let mut south = 0;
-    let mut east = 0;
-    let mut west = 0;
 
-    for idx in (0..row).rev() {
-        north += 1;
-        if rows[idx][col] >= target {
-            break;
+    let scan_v = |is_done: &mut bool, item: &Vec<usize>| {
+        if *is_done {
+            None
+        } else {
+            *is_done = item[col] >= target;
+            Some(0)
         }
-    }
+    };
+    let scan_h = |is_done: &mut bool, item: &usize| {
+        if *is_done {
+            None
+        } else {
+            *is_done = *item >= target;
+            Some(0)
+        }
+    };
 
-    for idx in row + 1..rows.len() {
-        south += 1;
-        if rows[idx][col] >= target {
-            break;
-        }
-    }
-
-    for idx in (0..col).rev() {
-        west += 1;
-        if rows[row][idx] >= target {
-            break;
-        }
-    }
-
-    for idx in col + 1..rows[0].len() {
-        east += 1;
-        if rows[row][idx] >= target {
-            break;
-        }
-    }
+    let north = rows.iter().take(row).rev().scan(false, scan_v).count();
+    let south = rows.iter().skip(row + 1).scan(false, scan_v).count();
+    let west = rows[row].iter().take(col).rev().scan(false, scan_h).count();
+    let east = rows[row].iter().skip(col + 1).scan(false, scan_h).count();
 
     north * south * east * west
 }
