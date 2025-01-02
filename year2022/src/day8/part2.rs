@@ -26,38 +26,28 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
 
 fn get_score(rows: &[Vec<usize>], row: usize, col: usize) -> usize {
     let target = rows[row][col];
-    let mut north = 0;
-    let mut south = 0;
-    let mut east = 0;
-    let mut west = 0;
 
-    for idx in (0..row).rev() {
-        north += 1;
-        if rows[idx][col] >= target {
-            break;
+    let scan_v = |is_done: &mut bool, item: &Vec<usize>| {
+        if *is_done {
+            None
+        } else {
+            *is_done = item[col] >= target;
+            Some(0)
         }
-    }
+    };
+    let scan_h = |is_done: &mut bool, item: &usize| {
+        if *is_done {
+            None
+        } else {
+            *is_done = *item >= target;
+            Some(0)
+        }
+    };
 
-    for idx in row + 1..rows.len() {
-        south += 1;
-        if rows[idx][col] >= target {
-            break;
-        }
-    }
-
-    for idx in (0..col).rev() {
-        west += 1;
-        if rows[row][idx] >= target {
-            break;
-        }
-    }
-
-    for idx in col + 1..rows[0].len() {
-        east += 1;
-        if rows[row][idx] >= target {
-            break;
-        }
-    }
+    let north = rows.iter().take(row).rev().scan(false, scan_v).count();
+    let south = rows.iter().skip(row + 1).scan(false, scan_v).count();
+    let west = rows[row].iter().take(col).rev().scan(false, scan_h).count();
+    let east = rows[row].iter().skip(col + 1).scan(false, scan_h).count();
 
     north * south * east * west
 }
