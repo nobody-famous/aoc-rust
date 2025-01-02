@@ -11,13 +11,16 @@ pub fn solve() -> AocResult<()> {
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let rows = parse_rows(lines);
-    let mut high: usize = 0;
 
-    for row in 1..rows.len() - 1 {
-        for col in 1..rows[0].len() - 1 {
-            high = cmp::max(high, get_score(&rows, row, col));
-        }
-    }
+    let high = rows.iter().enumerate().fold(0, |acc, (row, _)| {
+        cmp::max(
+            acc,
+            rows[0]
+                .iter()
+                .enumerate()
+                .fold(0, |acc, (col, _)| cmp::max(acc, get_score(&rows, row, col))),
+        )
+    });
 
     Ok(high)
 }
