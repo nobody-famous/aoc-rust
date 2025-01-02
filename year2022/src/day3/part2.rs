@@ -2,10 +2,10 @@ use core::AocResult;
 
 use crate::day3::utils::priority;
 
-use super::utils::{get_char_set, FILE_NAME};
+use super::utils::get_char_set;
 
-pub fn solve() -> AocResult<u32> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<u32> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<u32> {
@@ -35,13 +35,16 @@ fn find_badge(group: &[&String]) -> char {
     let b = get_char_set(group[1].as_str());
     let c = get_char_set(group[2].as_str());
 
-    a.iter().fold(' ', |acc, ch| {
-        if acc != ' ' || !b.contains(ch) || !c.contains(ch) {
-            acc
-        } else {
-            *ch
-        }
-    })
+    a.iter().fold(
+        ' ',
+        |acc, ch| {
+            if acc != ' ' || !b.contains(ch) || !c.contains(ch) {
+                acc
+            } else {
+                *ch
+            }
+        },
+    )
 }
 
 #[cfg(test)]

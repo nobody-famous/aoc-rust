@@ -1,7 +1,5 @@
 use core::AocResult;
 
-pub const FILE_NAME: &str = "year2022/src/day6/puzzle.txt";
-
 pub fn get_answer(lines: Vec<String>, length: usize) -> AocResult<u32> {
     let line: &String = &lines[0];
     let mut idx = 0;

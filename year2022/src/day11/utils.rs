@@ -3,8 +3,6 @@ use std::collections::HashMap;
 
 use regex::Regex;
 
-pub const FILE_NAME: &str = "year2022/src/day11/puzzle.txt";
-
 #[derive(Debug, Clone)]
 pub enum Arg {
     Value(usize),
@@ -100,13 +98,8 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
     let mut monkey_map: HashMap<usize, Monkey> = HashMap::new();
     let mut cur_monkey: usize = 0;
     let mut cur_items: Vec<usize> = vec![];
-    let mut cur_op: Operation = Operation {
-        left: Arg::Old,
-        right: Arg::Old,
-        op: '+',
-        true_target: 0,
-        false_target: 0,
-    };
+    let mut cur_op: Operation =
+        Operation { left: Arg::Old, right: Arg::Old, op: '+', true_target: 0, false_target: 0 };
     let mut cur_test: usize = 0;
 
     for line in lines {
@@ -128,10 +121,8 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
                 }
             } else if items.is_match(&line) {
                 for cap in items.captures_iter(&line) {
-                    let pieces: Vec<String> = cap[1]
-                        .split(',')
-                        .map(|p| p.trim().replace(",", ""))
-                        .collect();
+                    let pieces: Vec<String> =
+                        cap[1].split(',').map(|p| p.trim().replace(",", "")).collect();
 
                     cur_items = vec![];
                     for piece in pieces {
@@ -145,13 +136,7 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
                     let op_str = &cap[2].chars().next();
                     let op = op_str.ok_or("Could not find op string")?;
 
-                    cur_op = Operation {
-                        left,
-                        op,
-                        right,
-                        true_target: 0,
-                        false_target: 0,
-                    };
+                    cur_op = Operation { left, op, right, true_target: 0, false_target: 0 };
                 }
             } else if test.is_match(&line) {
                 for cap in test.captures_iter(&line) {
@@ -186,12 +171,7 @@ pub fn parse(lines: Vec<String>) -> Result<HashMap<usize, Monkey>, String> {
 
     monkey_map.insert(
         cur_monkey,
-        Monkey {
-            items: cur_items.clone(),
-            op: cur_op,
-            test: cur_test,
-            inspected: 0,
-        },
+        Monkey { items: cur_items.clone(), op: cur_op, test: cur_test, inspected: 0 },
     );
 
     Ok(monkey_map)

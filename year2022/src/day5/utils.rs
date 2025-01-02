@@ -1,5 +1,3 @@
-pub const FILE_NAME: &str = "year2022/src/day5/puzzle.txt";
-
 pub enum ParseState {
     Stacks,
     IDs,
@@ -21,10 +19,7 @@ pub struct State {
 
 impl State {
     pub fn new(size: usize) -> Self {
-        State {
-            stacks: vec![vec![]; size],
-            moves: vec![],
-        }
+        State { stacks: vec![vec![]; size], moves: vec![] }
     }
 
     pub fn add(&mut self, idx: usize, ch: char) {
@@ -56,18 +51,10 @@ pub fn parse(lines: Vec<String>) -> State {
 }
 
 fn parse_move(line: &&String) -> Move {
-    let pieces: Vec<usize> = line
-        .split(' ')
-        .skip(1)
-        .step_by(2)
-        .map(|item| item.parse().unwrap_or(0))
-        .collect();
+    let pieces: Vec<usize> =
+        line.split(' ').skip(1).step_by(2).map(|item| item.parse().unwrap_or(0)).collect();
 
-    Move {
-        count: pieces[0],
-        from: pieces[1],
-        to: pieces[2],
-    }
+    Move { count: pieces[0], from: pieces[1], to: pieces[2] }
 }
 
 fn get_state_size(ids: &str) -> usize {

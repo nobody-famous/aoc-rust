@@ -1,9 +1,7 @@
 use core::AocResult;
 
-use super::utils;
-
-pub fn solve() -> AocResult<u32> {
-    core::do_work(utils::FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<u32> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<u32> {
@@ -31,11 +29,8 @@ mod tests {
 
     #[test]
     fn sample() {
-        let lines: Vec<String> = vec![
-            String::from("A Y"),
-            String::from("B X"),
-            String::from("C Z"),
-        ];
+        let lines: Vec<String> =
+            vec![String::from("A Y"), String::from("B X"), String::from("C Z")];
 
         assert_eq!(get_answer(lines).unwrap(), 15)
     }

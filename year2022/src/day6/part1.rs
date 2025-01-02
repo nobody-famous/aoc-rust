@@ -1,11 +1,11 @@
 use core::AocResult;
 
-use super::utils::{get_answer, FILE_NAME};
+use super::utils::get_answer;
 
 const MARKER_LENGTH: usize = 4;
 
-pub fn solve() -> AocResult<u32> {
-    core::do_work(FILE_NAME, |lines| get_answer(lines, MARKER_LENGTH))
+pub fn solve(file_name: &str) -> AocResult<u32> {
+    core::do_work(file_name, |lines| get_answer(lines, MARKER_LENGTH))
 }
 
 #[cfg(test)]

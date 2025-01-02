@@ -2,18 +2,14 @@ use core::AocResult;
 
 use crate::day4::utils::parse_pair;
 
-use super::utils::{Pair, FILE_NAME};
+use super::utils::Pair;
 
-pub fn solve() -> AocResult<usize> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<usize> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
-    Ok(lines
-        .iter()
-        .map(|line| parse_pair(line))
-        .filter(does_overlap)
-        .count())
+    Ok(lines.iter().map(|line| parse_pair(line)).filter(does_overlap).count())
 }
 
 fn does_overlap(pair: &Pair) -> bool {

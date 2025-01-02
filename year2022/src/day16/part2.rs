@@ -1,9 +1,9 @@
 use core::AocResult;
 
-use super::utils::{get_mask, parse, walk, FILE_NAME};
+use super::utils::{get_mask, parse, walk};
 
-pub fn solve() -> AocResult<usize> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<usize> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
