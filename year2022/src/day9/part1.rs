@@ -22,7 +22,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
         for _ in 0..to_move.dist {
             (state.knots[0], state.knots[1]) =
                 do_move(&state.knots[0], &state.knots[1], &to_move.dir);
-            state.seen.insert(state.knots[1].clone());
+            state.seen.insert(state.knots[1]);
         }
     }
 

@@ -27,12 +27,12 @@ fn get_answer(lines: Vec<String>) -> AocResult<u32> {
             acc
         })
         .iter()
-        .map(find_badge)
+        .map(|g| find_badge(g))
         .map(priority)
         .sum::<u32>())
 }
 
-fn find_badge(group: &Vec<&String>) -> char {
+fn find_badge(group: &[&String]) -> char {
     let a = get_char_set(group[0].as_str());
     let b = get_char_set(group[1].as_str());
     let c = get_char_set(group[2].as_str());

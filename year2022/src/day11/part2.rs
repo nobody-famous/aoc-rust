@@ -10,7 +10,7 @@ pub fn solve() -> AocResult<()> {
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let mut monkeys = parse(lines)?;
-    let mod_value: usize = monkeys.iter().map(|(_, m)| m.test).product();
+    let mod_value: usize = monkeys.values().map(|m| m.test).product();
 
     for _ in 0..10000 {
         if let Some(e) = round(&mut monkeys, &|monkey: &Monkey, item| {
@@ -35,7 +35,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
         }
     }
 
-    let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
+    let mut inspected: Vec<usize> = monkeys.values().map(|m| m.inspected).collect();
 
     inspected.sort();
     inspected.reverse();

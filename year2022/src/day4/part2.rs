@@ -11,7 +11,11 @@ pub fn solve() -> AocResult<()> {
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
-    Ok(lines.iter().map(parse_pair).filter(does_overlap).count())
+    Ok(lines
+        .iter()
+        .map(|line| parse_pair(line))
+        .filter(does_overlap)
+        .count())
 }
 
 fn does_overlap(pair: &Pair) -> bool {

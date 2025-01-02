@@ -27,9 +27,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
                 state.knots[idx] = move_follower(&state.knots[idx - 1], &state.knots[idx]);
             }
 
-            state
-                .seen
-                .insert(state.knots[state.knots.len() - 1].clone());
+            state.seen.insert(state.knots[state.knots.len() - 1]);
         }
     }
 

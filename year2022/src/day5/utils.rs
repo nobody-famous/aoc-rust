@@ -27,7 +27,7 @@ impl State {
         }
     }
 
-    pub fn add(self: &mut Self, idx: usize, ch: char) {
+    pub fn add(&mut self, idx: usize, ch: char) {
         self.stacks[idx].push(ch)
     }
 }
@@ -60,10 +60,7 @@ fn parse_move(line: &&String) -> Move {
         .split(' ')
         .skip(1)
         .step_by(2)
-        .map(|item| match item.parse() {
-            Ok(n) => n,
-            Err(_) => 0,
-        })
+        .map(|item| item.parse().unwrap_or(0))
         .collect();
 
     Move {
@@ -83,7 +80,7 @@ fn get_state_size(ids: &str) -> usize {
     0
 }
 
-fn split_input(lines: &Vec<String>) -> (Vec<&String>, &str, Vec<&String>) {
+fn split_input(lines: &[String]) -> (Vec<&String>, &str, Vec<&String>) {
     let mut stacks: Vec<&String> = vec![];
     let mut ids: &str = "";
     let mut moves: Vec<&String> = vec![];

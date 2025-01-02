@@ -12,7 +12,7 @@ pub struct Pair {
     pub right: Range,
 }
 
-pub fn parse_pair(line: &String) -> Pair {
+pub fn parse_pair(line: &str) -> Pair {
     let parts: Vec<Range> = line.split(',').map(parse_range).collect();
 
     Pair {
@@ -31,8 +31,5 @@ pub fn parse_range(data: &str) -> Range {
 }
 
 pub fn parse_int(data: &str) -> u32 {
-    match data.parse::<u32>() {
-        Ok(n) => n,
-        Err(_) => 0,
-    }
+    data.parse::<u32>().unwrap_or(0)
 }

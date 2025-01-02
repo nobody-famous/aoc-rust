@@ -22,10 +22,7 @@ pub fn read_lines(file_name: &str) -> io::Result<Vec<String>> {
     let lines = io::BufReader::new(handle)
         .lines()
         .filter(|result| result.is_ok())
-        .map(|result| match result {
-            Ok(line) => line,
-            _ => String::from(""),
-        })
+        .map(|result| result.unwrap_or_default())
         .collect();
 
     Ok(lines)

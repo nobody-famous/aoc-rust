@@ -27,7 +27,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     }))
 }
 
-fn check_row(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
+fn check_row(rows: &[Vec<usize>], visible: &mut [Vec<bool>], idx: usize) {
     let row = &rows[idx];
     let mut max = rows[idx][0];
 
@@ -41,7 +41,7 @@ fn check_row(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
     }
 }
 
-fn check_col(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
+fn check_col(rows: &[Vec<usize>], visible: &mut [Vec<bool>], idx: usize) {
     let mut max = rows[0][idx];
 
     for row in 1..rows.len() - 1 {
@@ -55,8 +55,8 @@ fn check_col(rows: &Vec<Vec<usize>>, visible: &mut Vec<Vec<bool>>, idx: usize) {
 }
 
 fn update_col(
-    rows: &Vec<Vec<usize>>,
-    visible: &mut Vec<Vec<bool>>,
+    rows: &[Vec<usize>],
+    visible: &mut [Vec<bool>],
     idx: usize,
     row: usize,
     max: usize,
@@ -74,8 +74,8 @@ fn update_col(
 }
 
 fn update_row(
-    row: &Vec<usize>,
-    visible: &mut Vec<Vec<bool>>,
+    row: &[usize],
+    visible: &mut [Vec<bool>],
     idx: usize,
     col: usize,
     max: usize,

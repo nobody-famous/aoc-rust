@@ -45,11 +45,7 @@ fn walk_node(
         let target_valve = get_cfg_valve(cfg, *target)?;
 
         let new_time = time + to_target + 1;
-        let rem_time = if new_time < max_time {
-            max_time - new_time
-        } else {
-            0
-        };
+        let rem_time = max_time.saturating_sub(new_time);
         let new_flow = flow + (target_valve.flow * rem_time);
 
         if new_time < max_time {
@@ -85,10 +81,7 @@ fn get_dist_to_target(dists: &HashMap<usize, usize>, target: usize) -> Result<us
     }
 }
 
-fn get_cfg_dists_map<'a>(
-    cfg: &'a Config,
-    target: usize,
-) -> Result<&'a HashMap<usize, usize>, String> {
+fn get_cfg_dists_map(cfg: &Config, target: usize) -> Result<&HashMap<usize, usize>, String> {
     match cfg.dist_map.get(&target) {
         Some(d) => Ok(d),
         None => Err(format!("Could not find distances for {:?}", target)),
@@ -114,7 +107,7 @@ pub fn parse(lines: Vec<String>) -> Result<Config, String> {
     let masks = assign_masks(&need_masks);
     let mut to_open: Vec<usize> = vec![];
     for name in &to_open_names {
-        to_open.push(get_mask(&masks, &name)?);
+        to_open.push(get_mask(&masks, name)?);
     }
 
     let valve_map: HashMap<String, Valve> = valves.iter().fold(HashMap::new(), |mut acc, valve| {
@@ -124,7 +117,7 @@ pub fn parse(lines: Vec<String>) -> Result<Config, String> {
     let mut valve_map_masked: HashMap<usize, Valve> = HashMap::new();
     for (key, value) in &valve_map {
         if masks.contains_key(key) {
-            valve_map_masked.insert(get_mask(&masks, &key)?, value.clone());
+            valve_map_masked.insert(get_mask(&masks, key)?, value.clone());
         }
     }
 
@@ -159,13 +152,11 @@ pub fn get_mask(masks: &HashMap<String, usize>, name: &String) -> Result<usize, 
     }
 }
 
-fn assign_masks(names: &Vec<String>) -> HashMap<String, usize> {
+fn assign_masks(names: &[String]) -> HashMap<String, usize> {
     let mut masks: HashMap<String, usize> = HashMap::new();
-    let mut shift = 0;
 
-    for name in names {
+    for (shift, name) in names.iter().enumerate() {
         masks.insert(name.clone(), 1 << shift);
-        shift += 1;
     }
 
     masks
@@ -192,7 +183,7 @@ fn get_dists(
     start: &String,
 ) -> Result<HashMap<String, usize>, String> {
     let mut dists: HashMap<String, usize> = HashMap::new();
-    let start_valve = lookup_valve(&valves, start)?;
+    let start_valve = lookup_valve(valves, start)?;
     let mut to_visit: Vec<String> = start_valve.kids.clone();
     let mut seen: HashSet<String> = HashSet::new();
     let mut dist: usize = 0;
@@ -200,7 +191,7 @@ fn get_dists(
     dists.insert(start.clone(), 0);
     seen.insert(start.clone());
 
-    while to_visit.len() > 0 {
+    while !to_visit.is_empty() {
         let mut next_nodes: Vec<String> = vec![];
         dist += 1;
 
@@ -233,7 +224,7 @@ fn lookup_valve<'a>(
     }
 }
 
-fn parse_valve(line: &String) -> Result<Valve, String> {
+fn parse_valve(line: &str) -> Result<Valve, String> {
     let parts: Vec<&str> = line.split(' ').collect();
     let name = parts[1];
     let flow = parse_flow(parts[4])?;

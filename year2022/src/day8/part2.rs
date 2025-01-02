@@ -24,7 +24,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     Ok(high)
 }
 
-fn get_score(rows: &Vec<Vec<usize>>, row: usize, col: usize) -> usize {
+fn get_score(rows: &[Vec<usize>], row: usize, col: usize) -> usize {
     let target = rows[row][col];
     let mut north = 0;
     let mut south = 0;

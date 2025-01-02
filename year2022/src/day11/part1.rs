@@ -15,7 +15,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
         round(&mut monkeys, &update_worry)?;
     }
 
-    let mut inspected: Vec<usize> = monkeys.iter().map(|(_, m)| m.inspected).collect();
+    let mut inspected: Vec<usize> = monkeys.values().map(|m| m.inspected).collect();
 
     inspected.sort();
     inspected.reverse();

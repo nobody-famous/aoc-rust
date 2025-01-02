@@ -21,9 +21,8 @@ fn pop(state: &mut State) -> AocResult<()> {
                 state.found.push(n);
             }
 
-            match state.stack.pop() {
-                Some(n1) => state.stack.push(n + n1),
-                None => (),
+            if let Some(n1) = state.stack.pop() {
+                state.stack.push(n + n1)
             };
 
             Ok(())
