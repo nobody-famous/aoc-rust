@@ -37,15 +37,11 @@ pub fn do_work<T>(
 where
     T: std::fmt::Debug,
 {
-    match read_lines(file_name) {
-        Ok(lines) => {
-            let answer = get_answer(lines)?;
+    let lines = read_lines(file_name)?;
+    let answer = get_answer(lines)?;
 
-            match check_answer(&answer, &exp_answer) {
-                true => Ok(()),
-                false => Err(std::format!("Wrong answer {:?}", answer).into()),
-            }
-        }
-        Err(e) => Err(e.into()),
+    match check_answer(&answer, &exp_answer) {
+        true => Ok(()),
+        false => Err(std::format!("Wrong answer {:?}", answer).into()),
     }
 }
