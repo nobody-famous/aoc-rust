@@ -13,7 +13,7 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let start = get_mask(&config.masks, &"AA".to_string())?;
     let flows = walk(&config, start, 30)?;
 
-    let dists: Vec<usize> = flows.iter().map(|(_, value)| *value).collect();
+    let dists: Vec<usize> = flows.values().copied().collect();
 
     match dists.iter().max() {
         Some(v) => Ok(*v),

@@ -21,15 +21,11 @@ fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     for i in 0..tmp.len() - 1 {
         let (s1, v1) = tmp[i];
 
-        for j in i + 1..tmp.len() {
-            let (s2, v2) = tmp[j];
-
-            if s1 & s2 == 0 {
-                if v1 + v2 > highest {
-                    highest = v1 + v2;
-                }
+        tmp.iter().skip(i + 1).for_each(|(s2, v2)| {
+            if *s1 & *s2 == 0 && *v1 + *v2 > highest {
+                highest = *v1 + *v2;
             }
-        }
+        })
     }
 
     Ok(highest)
