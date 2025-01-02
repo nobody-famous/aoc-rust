@@ -4,10 +4,8 @@ use crate::day3::utils::priority;
 
 use super::utils::{get_char_set, FILE_NAME};
 
-const CORRECT_ANSWER: u32 = 2510;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<u32> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<u32> {

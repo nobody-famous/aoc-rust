@@ -4,10 +4,8 @@ use crate::day9::utils::{do_move, move_follower, State};
 
 use super::utils::{parse_move, Move, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 2482;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {

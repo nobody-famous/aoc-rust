@@ -3,10 +3,8 @@ use std::cmp;
 
 use super::utils::{parse_rows, FILE_NAME};
 
-const CORRECT_ANSWER: usize = 595080;
-
-pub fn solve() -> AocResult<()> {
-    core::do_work(FILE_NAME, CORRECT_ANSWER, get_answer, |a, b| a == b)
+pub fn solve() -> AocResult<usize> {
+    core::do_work(FILE_NAME, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {

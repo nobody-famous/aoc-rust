@@ -5,14 +5,14 @@ use std::{
 
 pub type DynError = dyn std::error::Error;
 pub type AocResult<T> = Result<T, Box<DynError>>;
-pub type ProblemFn = fn() -> AocResult<()>;
+
 pub struct Problem {
     pub label: &'static str,
-    pub to_run: ProblemFn,
+    pub to_run: Box<dyn (Fn() -> String)>,
 }
 
 impl Problem {
-    pub fn new(label: &'static str, to_run: ProblemFn) -> Self {
+    pub fn new(label: &'static str, to_run: Box<dyn (Fn() -> String)>) -> Self {
         Problem { label, to_run }
     }
 }
@@ -28,20 +28,12 @@ pub fn read_lines(file_name: &str) -> io::Result<Vec<String>> {
     Ok(lines)
 }
 
-pub fn do_work<T>(
-    file_name: &str,
-    exp_answer: T,
-    get_answer: impl Fn(Vec<String>) -> AocResult<T>,
-    check_answer: impl Fn(&T, &T) -> bool,
-) -> AocResult<()>
+pub fn do_work<T>(file_name: &str, get_answer: impl Fn(Vec<String>) -> AocResult<T>) -> AocResult<T>
 where
     T: std::fmt::Debug,
 {
     let lines = read_lines(file_name)?;
     let answer = get_answer(lines)?;
 
-    match check_answer(&answer, &exp_answer) {
-        true => Ok(()),
-        false => Err(std::format!("Wrong answer {:?}", answer).into()),
-    }
+    Ok(answer)
 }

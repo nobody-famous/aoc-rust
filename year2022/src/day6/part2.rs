@@ -3,16 +3,10 @@ use core::AocResult;
 use super::utils::FILE_NAME;
 use crate::day6::utils::get_answer;
 
-const CORRECT_ANSWER: u32 = 3697;
 const MARKER_LENGTH: usize = 14;
 
-pub fn solve() -> AocResult<()> {
-    core::do_work(
-        FILE_NAME,
-        CORRECT_ANSWER,
-        |lines| get_answer(lines, MARKER_LENGTH),
-        |a, b| a == b,
-    )
+pub fn solve() -> AocResult<u32> {
+    core::do_work(FILE_NAME, |lines| get_answer(lines, MARKER_LENGTH))
 }
 
 #[cfg(test)]
