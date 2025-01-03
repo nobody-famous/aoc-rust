@@ -1,10 +1,13 @@
 use core::AocResult;
 
+use super::utils::parse;
+
 pub fn solve(file_name: &str) -> AocResult<usize> {
     core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
+    parse(lines);
     Ok(0)
 }
 
