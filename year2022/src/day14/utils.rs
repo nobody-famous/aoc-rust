@@ -1,15 +1,61 @@
+use std::collections::HashSet;
+
 use regex::Regex;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Point {
-    pub x: usize,
-    pub y: usize,
+    pub x: isize,
+    pub y: isize,
 }
 
-pub fn parse(lines: Vec<String>) -> Result<Vec<Vec<Point>>, String> {
+pub fn parse(lines: Vec<String>) -> Result<HashSet<Point>, String> {
     let points_regex_result = Regex::new(r"(\d+),(\d+)(\s.*?->\s.*?)?");
     let Ok(points_re) = points_regex_result else { return Err("Failed to create regex".into()) };
 
-    lines.iter().map(|line| parse_line(&points_re, line)).collect()
+    lines
+        .iter()
+        .map(|line| parse_line(&points_re, line))
+        .collect::<Result<Vec<Vec<Point>>, String>>()
+        .and_then(populate_map)
+}
+
+fn populate_map(lines: Vec<Vec<Point>>) -> Result<HashSet<Point>, String> {
+    Ok(lines.iter().fold(HashSet::new(), |mut set, line| {
+        add_points(&mut set, line);
+        set
+    }))
+}
+
+fn add_points(set: &mut HashSet<Point>, line: &[Point]) {
+    line.windows(2).for_each(|pair| {
+        let (Some(first), Some(last)) = (pair.first(), pair.get(1)) else { return };
+        add_line(set, first, last);
+    });
+}
+
+fn add_line(set: &mut HashSet<Point>, first: &Point, last: &Point) {
+    let mut x = first.x;
+    let mut y = first.y;
+    let x_diff = get_diff(first.x, last.x);
+    let y_diff = get_diff(first.y, last.y);
+
+    set.insert(Point { x, y });
+    set.insert(Point { x: last.x, y: last.y });
+
+    while x != last.x || y != last.y {
+        x += x_diff;
+        y += y_diff;
+
+        set.insert(Point { x, y });
+    }
+}
+
+fn get_diff(a: isize, b: isize) -> isize {
+    match a.cmp(&b) {
+        std::cmp::Ordering::Less => 1,
+        std::cmp::Ordering::Equal => 0,
+        std::cmp::Ordering::Greater => -1,
+    }
 }
 
 fn parse_line(re: &Regex, line: &str) -> Result<Vec<Point>, String> {
@@ -38,8 +84,8 @@ fn parse_point(x_text: &str, y_text: &str) -> Result<Point, String> {
     }
 }
 
-fn parse_usize(text: &str) -> Result<usize, String> {
-    match text.parse::<usize>() {
+fn parse_usize(text: &str) -> Result<isize, String> {
+    match text.parse::<isize>() {
         Ok(n) => Ok(n),
         Err(e) => Err(format!("Failed to parse number {:?}: {:?}", text, e.to_string())),
     }
