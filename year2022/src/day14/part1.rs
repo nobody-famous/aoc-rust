@@ -7,7 +7,9 @@ pub fn solve(file_name: &str) -> AocResult<usize> {
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
-    parse(lines);
+    let paths = parse(lines)?;
+
+    println!("***** PATHS COUNT {:?}", paths.len());
     Ok(0)
 }
 
