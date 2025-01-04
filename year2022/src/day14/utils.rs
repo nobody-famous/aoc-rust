@@ -19,6 +19,35 @@ pub fn parse(lines: Vec<String>) -> Result<HashSet<Point>, String> {
         .and_then(populate_map)
 }
 
+pub fn print_grid(grid: &HashSet<Point>) {
+    let (min_pt, max_pt) = get_bounds(grid);
+
+    println!();
+    for y in min_pt.y..=max_pt.y {
+        for x in min_pt.x..=max_pt.x {
+            print!("{}", if grid.contains(&Point { x, y }) { '#' } else { '.' });
+        }
+        println!();
+    }
+}
+
+fn get_bounds(grid: &HashSet<Point>) -> (Point, Point) {
+    let min_x = grid.iter().map(|pt| pt.x).min();
+    let max_x = grid.iter().map(|pt| pt.x).max();
+    let min_y = grid.iter().map(|pt| pt.y).min();
+    let max_y = grid.iter().map(|pt| pt.y).max();
+    let min_pt = match (min_x, min_y) {
+        (None, None) | (None, Some(_)) | (Some(_), None) => todo!(),
+        (Some(x), Some(y)) => Point { x, y },
+    };
+    let max_pt = match (max_x, max_y) {
+        (None, None) | (None, Some(_)) | (Some(_), None) => todo!(),
+        (Some(x), Some(y)) => Point { x, y },
+    };
+
+    (min_pt, max_pt)
+}
+
 fn populate_map(lines: Vec<Vec<Point>>) -> Result<HashSet<Point>, String> {
     Ok(lines.iter().fold(HashSet::new(), |mut set, line| {
         add_points(&mut set, line);
@@ -40,7 +69,6 @@ fn add_line(set: &mut HashSet<Point>, first: &Point, last: &Point) {
     let y_diff = get_diff(first.y, last.y);
 
     set.insert(Point { x, y });
-    set.insert(Point { x: last.x, y: last.y });
 
     while x != last.x || y != last.y {
         x += x_diff;
