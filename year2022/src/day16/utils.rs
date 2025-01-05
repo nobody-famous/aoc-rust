@@ -1,7 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-pub const FILE_NAME: &str = "year2022/src/day16/puzzle.txt";
-
 #[derive(Debug, Clone)]
 pub struct Valve {
     name: String,
@@ -137,12 +135,7 @@ pub fn parse(lines: Vec<String>) -> Result<Config, String> {
         }
     }
 
-    Ok(Config {
-        valves: valve_map_masked,
-        to_open,
-        dist_map,
-        masks,
-    })
+    Ok(Config { valves: valve_map_masked, to_open, dist_map, masks })
 }
 
 pub fn get_mask(masks: &HashMap<String, usize>, name: &String) -> Result<usize, String> {
@@ -230,11 +223,7 @@ fn parse_valve(line: &str) -> Result<Valve, String> {
     let flow = parse_flow(parts[4])?;
     let kids: Vec<String> = parts[9..].iter().map(|kid| kid.replace(",", "")).collect();
 
-    Ok(Valve {
-        name: name.to_string(),
-        flow,
-        kids,
-    })
+    Ok(Valve { name: name.to_string(), flow, kids })
 }
 
 fn parse_flow(input: &str) -> Result<usize, String> {

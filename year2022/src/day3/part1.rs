@@ -1,9 +1,9 @@
 use core::AocResult;
 
-use super::utils::{get_char_set, priority, FILE_NAME};
+use super::utils::{get_char_set, priority};
 
-pub fn solve() -> AocResult<u32> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<u32> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<u32> {
@@ -19,13 +19,7 @@ fn find_same((a, b): (&str, &str)) -> char {
     let in_a = get_char_set(a);
     let in_b = get_char_set(b);
 
-    in_a.iter().fold(' ', |acc, ch| {
-        if acc != ' ' || !in_b.contains(ch) {
-            acc
-        } else {
-            *ch
-        }
-    })
+    in_a.iter().fold(' ', |acc, ch| if acc != ' ' || !in_b.contains(ch) { acc } else { *ch })
 }
 
 #[cfg(test)]

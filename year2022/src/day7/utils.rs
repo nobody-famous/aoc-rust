@@ -1,7 +1,5 @@
 use core::AocResult;
 
-pub const FILE_NAME: &str = "year2022/src/day7/puzzle.txt";
-
 #[derive(Debug)]
 pub struct State {
     pub stack: Vec<usize>,
@@ -11,11 +9,7 @@ pub struct State {
 
 impl State {
     pub fn new() -> Self {
-        State {
-            stack: vec![0],
-            found: vec![],
-            root: 0,
-        }
+        State { stack: vec![0], found: vec![], root: 0 }
     }
 }
 

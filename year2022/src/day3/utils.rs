@@ -1,7 +1,5 @@
 use std::collections::HashSet;
 
-pub const FILE_NAME: &str = "year2022/src/day3/puzzle.txt";
-
 pub fn get_char_set(s: &str) -> HashSet<char> {
     let mut chars = HashSet::new();
 

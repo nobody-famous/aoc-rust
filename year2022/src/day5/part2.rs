@@ -1,11 +1,9 @@
 use core::AocResult;
 
-use crate::{day5::utils::parse, day5::utils::FILE_NAME};
+use super::utils::{parse, State};
 
-use super::utils::State;
-
-pub fn solve() -> AocResult<String> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<String> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<String> {

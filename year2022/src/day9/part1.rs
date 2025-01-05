@@ -1,11 +1,9 @@
 use core::AocResult;
 
-use crate::day9::utils::{do_move, State};
+use super::utils::{do_move, parse_move, Move, State};
 
-use super::utils::{parse_move, Move, FILE_NAME};
-
-pub fn solve() -> AocResult<usize> {
-    core::do_work(FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<usize> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {

@@ -1,5 +1,3 @@
-pub const FILE_NAME: &str = "year2022/src/day1/puzzle.txt";
-
 pub fn parse(lines: Vec<String>) -> Vec<u32> {
     let groups = group_lines(&lines);
     let values = parse_ints(&groups);
@@ -12,10 +10,7 @@ fn sum_ints(values: &[Vec<u32>]) -> Vec<u32> {
 }
 
 fn parse_ints(lines: &[Vec<String>]) -> Vec<Vec<u32>> {
-    lines
-        .iter()
-        .map(|group| group.iter().map(|item| item.parse().unwrap_or(0)).collect())
-        .collect()
+    lines.iter().map(|group| group.iter().map(|item| item.parse().unwrap_or(0)).collect()).collect()
 }
 
 fn group_lines(lines: &[String]) -> Vec<Vec<String>> {

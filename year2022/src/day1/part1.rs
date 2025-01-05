@@ -2,8 +2,8 @@ use core::AocResult;
 
 use crate::day1::utils;
 
-pub fn solve() -> AocResult<u32> {
-    core::do_work(utils::FILE_NAME, get_answer)
+pub fn solve(file_name: &str) -> AocResult<u32> {
+    core::do_work(file_name, get_answer)
 }
 
 fn get_answer(lines: Vec<String>) -> AocResult<u32> {

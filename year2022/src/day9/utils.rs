@@ -1,7 +1,5 @@
 use std::collections::HashSet;
 
-pub const FILE_NAME: &str = "year2022/src/day9/puzzle.txt";
-
 #[derive(Debug)]
 pub enum Direction {
     U,
@@ -67,10 +65,7 @@ pub struct State {
 
 impl State {
     pub fn new(size: usize) -> Self {
-        State {
-            knots: vec![Point::new(0, 0); size],
-            seen: HashSet::new(),
-        }
+        State { knots: vec![Point::new(0, 0); size], seen: HashSet::new() }
     }
 }
 

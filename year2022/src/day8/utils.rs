@@ -1,10 +1,5 @@
-pub const FILE_NAME: &str = "year2022/src/day8/puzzle.txt";
-
 pub fn parse_rows(lines: Vec<String>) -> Vec<Vec<usize>> {
-    lines
-        .iter()
-        .map(|line| parse_row(line))
-        .collect::<Vec<Vec<usize>>>()
+    lines.iter().map(|line| parse_row(line)).collect::<Vec<Vec<usize>>>()
 }
 
 fn parse_row(line: &str) -> Vec<usize> {
@@ -15,10 +10,8 @@ fn parse_row(line: &str) -> Vec<usize> {
 }
 
 pub fn create_visible(rows: &[Vec<usize>]) -> Vec<Vec<bool>> {
-    let mut visible: Vec<Vec<bool>> = rows
-        .iter()
-        .map(|row| row.clone().iter().map(|_| false).collect())
-        .collect();
+    let mut visible: Vec<Vec<bool>> =
+        rows.iter().map(|row| row.clone().iter().map(|_| false).collect()).collect();
 
     set_boundary(&mut visible);
     visible
