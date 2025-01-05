@@ -2,13 +2,59 @@ use std::collections::HashSet;
 
 use regex::Regex;
 
+pub trait Grid {
+    fn contains(&self, x: isize, y: isize) -> bool;
+
+    fn find_next(&self, x: isize, y: isize) -> Option<Point>;
+
+    fn insert(&mut self, x: isize, y: isize, ch: char);
+
+    fn count_filled(&self) -> usize;
+
+    fn print(&self);
+}
+
+impl Grid for HashSet<Point> {
+    fn contains(&self, x: isize, y: isize) -> bool {
+        self.contains(&Point { x, y })
+    }
+
+    fn find_next(&self, x: isize, y: isize) -> Option<Point> {
+        self.iter()
+            .filter(|pt| pt.x == x && pt.y > y)
+            .map(|pt| pt.y)
+            .min()
+            .map(|new_y| Point { x, y: new_y - 1 })
+    }
+
+    fn insert(&mut self, x: isize, y: isize, _: char) {
+        self.insert(Point { x, y });
+    }
+
+    fn count_filled(&self) -> usize {
+        self.len()
+    }
+
+    fn print(self: &HashSet<Point>) {
+        let (min_pt, max_pt) = get_bounds(self);
+
+        println!();
+        for y in min_pt.y..=max_pt.y {
+            for x in min_pt.x..=max_pt.x {
+                print!("{}", if self.contains(&Point { x, y }) { '#' } else { '.' });
+            }
+            println!();
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Point {
     pub x: isize,
     pub y: isize,
 }
 
-pub fn parse(lines: Vec<String>) -> Result<HashSet<Point>, String> {
+pub fn parse(lines: Vec<String>) -> Result<Box<dyn Grid>, String> {
     let points_regex_result = Regex::new(r"(\d+),(\d+)(\s.*?->\s.*?)?");
     let Ok(points_re) = points_regex_result else { return Err("Failed to create regex".into()) };
 
@@ -17,18 +63,7 @@ pub fn parse(lines: Vec<String>) -> Result<HashSet<Point>, String> {
         .map(|line| parse_line(&points_re, line))
         .collect::<Result<Vec<Vec<Point>>, String>>()
         .and_then(populate_map)
-}
-
-pub fn print_grid(grid: &HashSet<Point>) {
-    let (min_pt, max_pt) = get_bounds(grid);
-
-    println!();
-    for y in min_pt.y..=max_pt.y {
-        for x in min_pt.x..=max_pt.x {
-            print!("{}", if grid.contains(&Point { x, y }) { '#' } else { '.' });
-        }
-        println!();
-    }
+        .map(|m| Box::new(m) as Box<dyn Grid>)
 }
 
 fn get_bounds(grid: &HashSet<Point>) -> (Point, Point) {
