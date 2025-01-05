@@ -1,6 +1,6 @@
 use core::AocResult;
 
-use super::utils::{parse, Grid};
+use super::utils::{drop_from, parse, SAND};
 
 pub fn solve(file_name: &str) -> AocResult<usize> {
     core::do_work(file_name, get_answer)
@@ -8,24 +8,10 @@ pub fn solve(file_name: &str) -> AocResult<usize> {
 
 fn get_answer(lines: Vec<String>) -> AocResult<usize> {
     let mut grid = parse(lines)?;
-    let initial_size = grid.count_filled();
 
     while drop_from(&mut grid, 500, 0) {}
 
-    Ok(grid.count_filled() - initial_size)
-}
-
-fn drop_from(grid: &mut Box<dyn Grid>, x: isize, y: isize) -> bool {
-    let Some(pt) = grid.find_next(x, y) else { return false };
-
-    if !grid.contains(pt.x - 1, pt.y + 1) {
-        drop_from(grid, pt.x - 1, pt.y + 1)
-    } else if !grid.contains(pt.x + 1, pt.y + 1) {
-        drop_from(grid, pt.x + 1, pt.y + 1)
-    } else {
-        grid.insert(pt.x, pt.y, 'O');
-        true
-    }
+    Ok(grid.count(SAND))
 }
 
 #[cfg(test)]

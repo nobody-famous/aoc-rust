@@ -58,6 +58,7 @@ fn main() {
             new("Day11/Part1", "2022/day11.txt", year2022::day11::part1::solve, 51075),
             new("Day11/Part2", "2022/day11.txt", year2022::day11::part2::solve, 11741456163),
             new("Day14/Part1", "2022/day14.txt", year2022::day14::part1::solve, 1078),
+            new("Day14/Part2", "2022/day14.txt", year2022::day14::part2::solve, 30157),
             new("Day16/Part1", "2022/day16.txt", year2022::day16::part1::solve, 1716),
             new("Day16/Part2", "2022/day16.txt", year2022::day16::part2::solve, 2504),
         ],
