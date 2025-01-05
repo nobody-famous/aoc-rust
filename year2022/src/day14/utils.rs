@@ -1,6 +1,7 @@
-use std::collections::HashSet;
-
 use regex::Regex;
+
+const GRID_HEIGHT: usize = 1000;
+const GRID_WIDTH: usize = 1000;
 
 pub trait Grid {
     fn contains(&self, x: isize, y: isize) -> bool;
@@ -14,37 +15,55 @@ pub trait Grid {
     fn print(&self);
 }
 
-impl Grid for HashSet<Point> {
+impl Grid for Vec<Vec<char>> {
     fn contains(&self, x: isize, y: isize) -> bool {
-        self.contains(&Point { x, y })
+        y >= 0
+            && y < self.len() as isize
+            && x >= 0
+            && x < self[0].len() as isize
+            && self[y as usize][x as usize] != '.'
     }
 
     fn find_next(&self, x: isize, y: isize) -> Option<Point> {
-        self.iter()
-            .filter(|pt| pt.x == x && pt.y > y)
-            .map(|pt| pt.y)
-            .min()
-            .map(|new_y| Point { x, y: new_y - 1 })
+        let mut pt = Point { x, y };
+
+        while self[pt.y as usize][pt.x as usize] == '.' {
+            pt.y += 1;
+            if pt.y >= GRID_HEIGHT as isize {
+                return None;
+            }
+        }
+
+        pt.y -= 1;
+        Some(pt)
     }
 
-    fn insert(&mut self, x: isize, y: isize, _: char) {
-        self.insert(Point { x, y });
+    fn insert(&mut self, x: isize, y: isize, ch: char) {
+        self[y as usize][x as usize] = ch
     }
 
     fn count_filled(&self) -> usize {
-        self.len()
+        let mut count = 0;
+
+        (0..self.len()).for_each(|y| {
+            for x in 0..self[y].len() {
+                if self[y][x] != '.' {
+                    count += 1
+                }
+            }
+        });
+
+        count
     }
 
-    fn print(self: &HashSet<Point>) {
-        let (min_pt, max_pt) = get_bounds(self);
-
+    fn print(&self) {
         println!();
-        for y in min_pt.y..=max_pt.y {
-            for x in min_pt.x..=max_pt.x {
-                print!("{}", if self.contains(&Point { x, y }) { '#' } else { '.' });
+        (0..self.len()).for_each(|y| {
+            for x in 0..self[y].len() {
+                print!("{}", self[y][x])
             }
             println!();
-        }
+        });
     }
 }
 
@@ -63,53 +82,35 @@ pub fn parse(lines: Vec<String>) -> Result<Box<dyn Grid>, String> {
         .map(|line| parse_line(&points_re, line))
         .collect::<Result<Vec<Vec<Point>>, String>>()
         .and_then(populate_map)
-        .map(|m| Box::new(m) as Box<dyn Grid>)
 }
 
-fn get_bounds(grid: &HashSet<Point>) -> (Point, Point) {
-    let min_x = grid.iter().map(|pt| pt.x).min();
-    let max_x = grid.iter().map(|pt| pt.x).max();
-    let min_y = grid.iter().map(|pt| pt.y).min();
-    let max_y = grid.iter().map(|pt| pt.y).max();
-    let min_pt = match (min_x, min_y) {
-        (None, None) | (None, Some(_)) | (Some(_), None) => todo!(),
-        (Some(x), Some(y)) => Point { x, y },
-    };
-    let max_pt = match (max_x, max_y) {
-        (None, None) | (None, Some(_)) | (Some(_), None) => todo!(),
-        (Some(x), Some(y)) => Point { x, y },
-    };
-
-    (min_pt, max_pt)
-}
-
-fn populate_map(lines: Vec<Vec<Point>>) -> Result<HashSet<Point>, String> {
-    Ok(lines.iter().fold(HashSet::new(), |mut set, line| {
-        add_points(&mut set, line);
-        set
+fn populate_map(lines: Vec<Vec<Point>>) -> Result<Box<dyn Grid>, String> {
+    Ok(lines.iter().fold(Box::new(vec![vec!['.'; GRID_HEIGHT]; GRID_WIDTH]), |mut grid, line| {
+        add_points(&mut grid, line);
+        grid
     }))
 }
 
-fn add_points(set: &mut HashSet<Point>, line: &[Point]) {
+fn add_points(grid: &mut Box<dyn Grid>, line: &[Point]) {
     line.windows(2).for_each(|pair| {
         let (Some(first), Some(last)) = (pair.first(), pair.get(1)) else { return };
-        add_line(set, first, last);
+        add_line(grid, first, last);
     });
 }
 
-fn add_line(set: &mut HashSet<Point>, first: &Point, last: &Point) {
+fn add_line(grid: &mut Box<dyn Grid>, first: &Point, last: &Point) {
     let mut x = first.x;
     let mut y = first.y;
     let x_diff = get_diff(first.x, last.x);
     let y_diff = get_diff(first.y, last.y);
 
-    set.insert(Point { x, y });
+    grid.insert(x, y, '#');
 
     while x != last.x || y != last.y {
         x += x_diff;
         y += y_diff;
 
-        set.insert(Point { x, y });
+        grid.insert(x, y, '#');
     }
 }
 
